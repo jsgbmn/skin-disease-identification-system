@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: skin-disease-detection
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: MODEL_PATH
+        value: models/skin_disease_model.h5

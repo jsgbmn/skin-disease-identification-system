@@ -1,73 +1,9 @@
-# ==========================================
-# SKIN DISEASE DETECTION - REQUIREMENTS
-# Python 3.8+ Required
-# ==========================================
-
-# --- WEB FRAMEWORK ---
-Flask==3.0.0                    # Main web framework
-Flask-CORS==4.0.0              # Cross-origin resource sharing
-Flask-SQLAlchemy==3.1.1        # Database ORM
-Flask-Login==0.6.3             # User authentication
-Flask-WTF==1.2.1               # Form handling
-Werkzeug==3.0.1                # WSGI utility library
-
-# --- DEEP LEARNING ---
-tensorflow==2.15.0             # Main DL framework
-keras==2.15.0                  # High-level neural network API
-scikit-learn==1.3.2            # Machine learning utilities
-
-# --- IMAGE PROCESSING ---
-opencv-python==4.9.0.80        # Computer vision library
-Pillow==10.2.0                 # Image manipulation
-imageio==2.33.1                # Image I/O
-albumentations==1.3.1          # Image augmentation
-
-# --- DATA SCIENCE ---
-numpy==1.24.3                  # Numerical computing
-pandas==2.1.4                  # Data manipulation
-scipy==1.11.4                  # Scientific computing
-
-# --- VISUALIZATION ---
-matplotlib==3.8.2              # Plotting library
-seaborn==0.13.1                # Statistical visualization
-plotly==5.18.0                 # Interactive plots
-
-# --- DATABASE ---
-SQLAlchemy==2.0.25             # SQL toolkit
-psycopg2-binary==2.9.9         # PostgreSQL adapter
-
-# --- SECURITY ---
-python-dotenv==1.0.0           # Environment variables
-cryptography==42.0.0           # Cryptographic recipes
-PyJWT==2.8.0                   # JSON Web Token
-bcrypt==4.1.2                  # Password hashing
-
-# --- FILE HANDLING ---
-python-multipart==0.0.6        # Multipart form data
-aiofiles==23.2.1               # Async file operations
-
-# --- PDF GENERATION ---
-reportlab==4.0.9               # PDF creation
-PyPDF2==3.0.1                  # PDF manipulation
-
-# --- API ---
-requests==2.31.0               # HTTP library
-urllib3==2.1.0                 # HTTP client
-
-# --- PRODUCTION ---
-gunicorn==21.2.0               # WSGI HTTP server
-
-# --- UTILITIES ---
-python-dateutil==2.8.2         # Date utilities
-pytz==2023.3                   # Timezone support
-tqdm==4.66.1                   # Progress bars
-click==8.1.7                   # CLI creation
-
-# --- TESTING ---
-pytest==7.4.4                  # Testing framework
-pytest-cov==4.1.0              # Coverage plugin
-coverage==4.1.0                # Code coverage
-
-# --- CODE QUALITY ---
-flake8==7.0.0                  # Linting
-black==23.12.1                 # Code formatting
+# requirements.txt
+Flask==3.0.0
+tensorflow==2.20.0
+opencv-python==4.9.0.80
+numpy==1.24.3
+Pillow==10.2.0
+python-dotenv==1.0.0
+gunicorn==21.2.0
+Werkzeug==3.0.1
