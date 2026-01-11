@@ -1,6 +1,9 @@
 ![Alt](https://repobeats.axiom.co/api/embed/b901de64a69da60beab16ac63ccf9cf5146a2882.svg "Repobeats analytics image")
+
 # SKIN Disease Identification System 🩺
-<img width="1487" height="1134" alt="Screenshot 2026-01-11 at 11 55 33 PM" src="https://github.com/user-attachments/assets/ac8e873e-0b9c-41aa-800f-39035275a605" />
+
+<img width="2534" height="2160" alt="Arc 2026-01-12 04:53:43 - Frame 441" src="https://github.com/user-attachments/assets/fa46a59c-9071-4aa3-b335-3ff7126aab0a" />
+
 
 A simple web app that lets you upload a skin image (or use your webcam) and get an AI-based prediction about possible skin disease. Built with Flask, TensorFlow/Keras, and OpenCV.
 
