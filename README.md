@@ -1,4 +1,5 @@
 # SKIN Disease Identification System 🩺
+<img width="1487" height="1134" alt="Screenshot 2026-01-11 at 11 55 33 PM" src="https://github.com/user-attachments/assets/ac8e873e-0b9c-41aa-800f-39035275a605" />
 
 A simple web app that lets you upload a skin image (or use your webcam) and get an AI-based prediction about possible skin disease. Built with Flask, TensorFlow/Keras, and OpenCV.
 
