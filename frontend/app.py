@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
 from flask import (
     Flask, flash, render_template, Response,
     request, redirect, url_for, session
@@ -16,6 +19,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 
 # Fixed MODEL_PATH - works on Render and locally
 MODEL_PATH = os.environ.get('MODEL_PATH', '../backend/models/model.h5')
+
 
 app = Flask(__name__, template_folder="templates")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
