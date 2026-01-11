@@ -13,7 +13,9 @@ from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = './static/Data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
-MODEL_PATH = '/Users/jsgbn/Desktop/skin-identification/backend/models/model.h5'
+
+# Fixed MODEL_PATH - works on Render and locally
+MODEL_PATH = os.environ.get('MODEL_PATH', '../backend/models/model.h5')
 
 app = Flask(__name__, template_folder="templates")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -123,11 +125,9 @@ def gen_frames():
 @app.route("/", methods=['GET'])
 @app.route("/index", methods=['GET'])
 def index():
-    # Clear session on GET request (page reload/refresh)
     if request.method == 'GET' and 'from_prediction' not in session:
         session.clear()
 
-    # Remove the flag after first load
     session.pop('from_prediction', None)
 
     return render_template('index.html')
@@ -154,7 +154,6 @@ def predicts():
         product = predict_path(file_path)
         user_image = url_for('static', filename=f'Data/{filename}')
 
-        # Set flag to prevent clearing on first render
         session['from_prediction'] = True
 
         return render_template('index.html',
@@ -189,7 +188,6 @@ def tasks():
                     product = predict_path(img_path)
                     user_image = url_for('static', filename=f'Data/{latest_capture}')
 
-                    # Set flag to prevent clearing on first render
                     session['from_prediction'] = True
 
                     return render_template('index.html',
@@ -230,7 +228,7 @@ def server_error(e):
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 10000))
     debug = os.environ.get('FLASK_ENV') != 'production'
 
     app.run(
