@@ -1,10 +1,15 @@
-name: skin-disease-identification
+name: skin-disease-env
+channels:
+  - defaults
+  - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.11
   - pip
-  - numpy
-  - pandas
-  - scikit-learn
-  - matplotlib
   - pip:
-      - any-other-needed-pip-package
+      - Flask==3.0.0
+      - gunicorn==21.2.0
+      - tensorflow-cpu==2.15.0
+      - opencv-python-headless==4.9.0.80
+      - numpy==1.24.3
+      - Pillow==10.2.0
+      - Werkzeug==3.0.1
