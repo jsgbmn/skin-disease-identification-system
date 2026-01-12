@@ -9,8 +9,6 @@ from flask import (
 import datetime
 import cv2
 import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = './static/Data'
@@ -38,24 +36,29 @@ def get_model():
     if model is None:
         try:
             import tensorflow as tf
+            from tensorflow.keras.models import load_model
             import gc
-            gc.collect()
 
-            tf.config.optimizer.set_jit(True)
+            tf.config.set_visible_devices([], 'GPU')
+
+            gc.collect()
 
             model_path = app.config['MODEL_PATH']
             if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Model file not found at: {model_path}")
+                raise FileNotFoundError(f"Model not found: {model_path}")
 
             model = load_model(model_path, compile=False)
             model.compile(optimizer='adam', loss='binary_crossentropy')
 
+            model.predict(np.zeros((1, 256, 256, 3)), verbose=0)
+
             gc.collect()
         except Exception as e:
-            raise RuntimeError(f"Failed to load model: {e}")
+            raise RuntimeError(f"Model loading failed: {e}")
     return model
 
 def load_image(img_path: str) -> np.ndarray:
+    from tensorflow.keras.preprocessing import image
     img = image.load_img(img_path, target_size=(256, 256))
     img_tensor = image.img_to_array(img)
     img_tensor = np.expand_dims(img_tensor, axis=0)
@@ -73,11 +76,10 @@ def predict_path(img_path: str) -> str:
         else:
             return f"No Skin Disease Detected (Confidence: {pred*100:.1f}%) - Regular checkups recommended."
     except Exception as e:
-        return f"Error during analysis: {str(e)}"
+        return f"Analysis error: {str(e)}"
 
 def init_camera():
     global camera
-
     if os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production':
         return False
 
@@ -94,10 +96,9 @@ def init_camera():
 
 def gen_frames():
     global capture, latest_capture
-
     if not init_camera():
         placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
-        cv2.putText(placeholder, "Camera Not Available on Server", (50, 240),
+        cv2.putText(placeholder, "Camera Not Available", (100, 240),
                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         ret, buffer = cv2.imencode('.jpg', placeholder)
         yield (b'--frame\r\n'
@@ -130,7 +131,6 @@ def gen_frames():
 def index():
     if request.method == 'GET' and 'from_prediction' not in session:
         session.clear()
-
     session.pop('from_prediction', None)
     return render_template('index.html')
 
@@ -166,10 +166,10 @@ def predicts():
                                  product=product,
                                  user_image=user_image)
         except Exception as e:
-            flash(f'Error processing file: {str(e)}')
+            flash(f'Error: {str(e)}')
             return redirect(url_for('index'))
 
-    flash('Invalid file type. Use PNG, JPG, JPEG, GIF, or BMP')
+    flash('Invalid file type')
     return redirect(url_for('index'))
 
 @app.route('/video_feed')
@@ -204,15 +204,23 @@ def tasks():
                                          product=product,
                                          user_image=user_image)
                 else:
-                    flash('Capture failed. Please try again.')
+                    flash('Capture failed')
             else:
-                flash('No image captured. Please try again.')
+                flash('No image captured')
 
     return redirect(url_for('index'))
 
 @app.route('/health')
 def health():
-    return {'status': 'healthy', 'model_loaded': model is not None}, 200
+    try:
+        status = {
+            'status': 'healthy',
+            'model_loaded': model is not None,
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        return status, 200
+    except Exception as e:
+        return {'status': 'unhealthy', 'error': str(e)}, 503
 
 @app.teardown_appcontext
 def cleanup(error):
