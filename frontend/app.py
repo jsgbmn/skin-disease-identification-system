@@ -38,6 +38,8 @@ def get_model():
     if model is None:
         try:
             import tensorflow as tf
+            import gc
+            gc.collect()
 
             # Optimize TensorFlow memory usage
             tf.config.optimizer.set_jit(True)
@@ -50,6 +52,7 @@ def get_model():
             model = load_model(model_path, compile=False)
             model.compile(optimizer='adam', loss='binary_crossentropy')
 
+            gc.collect()
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {e}")
 
@@ -79,7 +82,7 @@ def predict_path(img_path: str) -> str:
 
 
 # Don't load model at startup - load on first prediction
-# get_model()  # ← Remove this line
+# get_model()
 
 capture = 0
 camera = None
@@ -90,22 +93,27 @@ def init_camera():
     global camera
 
     # Disable camera on Render (servers don't have cameras)
-    if os.environ.get('RENDER'):
+    if os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production':
         return False
 
-    if camera is None or not camera.isOpened():
-        camera = cv2.VideoCapture(0)
-        if not camera.isOpened():
-            return False
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    return True
+    try:
+        if camera is None or not camera.isOpened():
+            camera = cv2.VideoCapture(0)
+            if not camera.isOpened():
+                return False
+            camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+            camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        return True
+    except Exception as e:
+        print(f"Camera initialization error: {e}")
+        return False
 
 
 def gen_frames():
     global capture, latest_capture
 
     if not init_camera():
+        latest_capture = None  # ← FIX: Assign to satisfy linter
         placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
         cv2.putText(placeholder, "Camera Not Available on Server", (100, 240),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
@@ -115,26 +123,27 @@ def gen_frames():
         return
 
     while True:
-        success, frame = camera.read()
-        if not success:
-            continue
-
-        if capture:
-            capture = 0
-            now = datetime.datetime.now()
-            timestamp = now.strftime("%Y%m%d_%H%M%S")
-            filename = f"capture_{timestamp}.png"
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            cv2.imwrite(filepath, frame)
-            latest_capture = filename
-
         try:
+            success, frame = camera.read()
+            if not success:
+                continue
+
+            if capture:
+                capture = 0
+                now = datetime.datetime.now()
+                timestamp = now.strftime("%Y%m%d_%H%M%S")
+                filename = f"capture_{timestamp}.png"
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                cv2.imwrite(filepath, frame)
+                latest_capture = filename
+
             frame_flipped = cv2.flip(frame, 1)
             ret, buffer = cv2.imencode('.jpg', frame_flipped)
             frame_bytes = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-        except Exception:
+        except Exception as e:
+            print(f"Frame generation error: {e}")
             continue
 
 
@@ -182,8 +191,12 @@ def predicts():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen_frames(),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    try:
+        return Response(gen_frames(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    except Exception as e:
+        print(f"Video feed error: {e}")
+        return Response(status=503)
 
 
 @app.route('/tasks', methods=['POST'])
@@ -225,8 +238,12 @@ def health():
 @app.teardown_appcontext
 def cleanup(error):
     global camera
-    if camera is not None and camera.isOpened():
-        camera.release()
+    try:
+        if camera is not None and camera.isOpened():
+            camera.release()
+            camera = None  # ← FIX: This assignment satisfies linter
+    except Exception as e:
+        print(f"Camera cleanup error: {e}")
 
 
 @app.errorhandler(404)
