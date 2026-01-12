@@ -201,7 +201,7 @@ def video_feed():
 
 @app.route('/tasks', methods=['POST'])
 def tasks():
-    global capture, latest_capture
+    global capture  # Only this needs global since we assign to it
 
     if request.method == 'POST':
         if request.form.get('click') == 'Capture':
@@ -210,6 +210,7 @@ def tasks():
             import time
             time.sleep(1.0)
 
+            # Access latest_capture without global (we only read it)
             if latest_capture:
                 img_path = os.path.join(app.config['UPLOAD_FOLDER'], latest_capture)
 
@@ -228,6 +229,7 @@ def tasks():
                 flash('No image captured. Please try again.')
 
     return redirect(url_for('index'))
+
 
 
 @app.route('/health')
