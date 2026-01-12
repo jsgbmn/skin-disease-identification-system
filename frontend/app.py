@@ -13,7 +13,6 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from werkzeug.utils import secure_filename
 
-
 UPLOAD_FOLDER = './static/Data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 MODEL_PATH = os.environ.get('MODEL_PATH', '../backend/models/model.h5')
@@ -27,11 +26,12 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-product
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 model = None
-
+capture = 0
+camera = None
+latest_capture = None
 
 def allowed_file(filename: str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
 
 def get_model():
     global model
@@ -41,21 +41,19 @@ def get_model():
             import gc
             gc.collect()
 
-            # Optimize TensorFlow memory usage
             tf.config.optimizer.set_jit(True)
 
             model_path = app.config['MODEL_PATH']
             if not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model file not found at: {model_path}")
 
-            # Load with optimization
             model = load_model(model_path, compile=False)
             model.compile(optimizer='adam', loss='binary_crossentropy')
 
             gc.collect()
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {e}")
-
+    return model
 
 def load_image(img_path: str) -> np.ndarray:
     img = image.load_img(img_path, target_size=(256, 256))
@@ -64,35 +62,22 @@ def load_image(img_path: str) -> np.ndarray:
     img_tensor = img_tensor / 255.0
     return img_tensor
 
-
 def predict_path(img_path: str) -> str:
-    if model is None:
-        get_model()
-
     try:
+        get_model()
         new_image = load_image(img_path)
         pred = model.predict(new_image, verbose=0)[0][0]
 
         if pred < 0.5:
-            return f"Skin Disease Detected (Confidence: {(1-pred)*100:.1f}%) - Please visit a specialist immediately."
+            return f"Skin Disease Detected (Confidence: {(1-pred)*100:.1f}%) - Please consult a dermatologist."
         else:
-            return f"No Skin Disease Detected (Confidence: {pred*100:.1f}%) - Consider visiting a dermatologist for verification."
+            return f"No Skin Disease Detected (Confidence: {pred*100:.1f}%) - Regular checkups recommended."
     except Exception as e:
         return f"Error during analysis: {str(e)}"
-
-
-# Don't load model at startup - load on first prediction
-# get_model()
-
-capture = 0
-camera = None
-latest_capture = None
-
 
 def init_camera():
     global camera
 
-    # Disable camera on Render (servers don't have cameras)
     if os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production':
         return False
 
@@ -105,18 +90,15 @@ def init_camera():
             camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         return True
     except Exception as e:
-        print(f"Camera initialization error: {e}")
         return False
-
 
 def gen_frames():
     global capture, latest_capture
 
     if not init_camera():
-        latest_capture = None  # ← FIX: Assign to satisfy linter
         placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
-        cv2.putText(placeholder, "Camera Not Available on Server", (100, 240),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+        cv2.putText(placeholder, "Camera Not Available on Server", (50, 240),
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         ret, buffer = cv2.imencode('.jpg', placeholder)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
@@ -130,8 +112,7 @@ def gen_frames():
 
             if capture:
                 capture = 0
-                now = datetime.datetime.now()
-                timestamp = now.strftime("%Y%m%d_%H%M%S")
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                 filename = f"capture_{timestamp}.png"
                 filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 cv2.imwrite(filepath, frame)
@@ -139,13 +120,10 @@ def gen_frames():
 
             frame_flipped = cv2.flip(frame, 1)
             ret, buffer = cv2.imencode('.jpg', frame_flipped)
-            frame_bytes = buffer.tobytes()
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                   b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
         except Exception as e:
-            print(f"Frame generation error: {e}")
             continue
-
 
 @app.route("/", methods=['GET'])
 @app.route("/index", methods=['GET'])
@@ -154,54 +132,57 @@ def index():
         session.clear()
 
     session.pop('from_prediction', None)
-
     return render_template('index.html')
 
-
-@app.route("/predicts", methods=['POST'])
+@app.route("/predicts", methods=['GET', 'POST'])
 def predicts():
+    if request.method == 'GET':
+        return redirect(url_for('index'))
+
     if 'file' not in request.files:
         flash('No file uploaded')
         return redirect(url_for('index'))
 
     file = request.files['file']
+
     if file.filename == '':
         flash('No file selected')
         return redirect(url_for('index'))
 
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{timestamp}_{filename}"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
+        try:
+            filename = secure_filename(file.filename)
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            unique_filename = f"{timestamp}_{filename}"
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+            file.save(file_path)
 
-        product = predict_path(file_path)
-        user_image = url_for('static', filename=f'Data/{filename}')
+            product = predict_path(file_path)
+            user_image = url_for('static', filename=f'Data/{unique_filename}')
 
-        session['from_prediction'] = True
+            session['from_prediction'] = True
 
-        return render_template('index.html',
-                             product=product,
-                             user_image=user_image)
+            return render_template('index.html',
+                                 product=product,
+                                 user_image=user_image)
+        except Exception as e:
+            flash(f'Error processing file: {str(e)}')
+            return redirect(url_for('index'))
 
     flash('Invalid file type. Use PNG, JPG, JPEG, GIF, or BMP')
     return redirect(url_for('index'))
-
 
 @app.route('/video_feed')
 def video_feed():
     try:
         return Response(gen_frames(),
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
+                       mimetype='multipart/x-mixed-replace; boundary=frame')
     except Exception as e:
-        print(f"Video feed error: {e}")
         return Response(status=503)
-
 
 @app.route('/tasks', methods=['POST'])
 def tasks():
-    global capture  # Only this needs global since we assign to it
+    global capture, latest_capture
 
     if request.method == 'POST':
         if request.form.get('click') == 'Capture':
@@ -210,7 +191,6 @@ def tasks():
             import time
             time.sleep(1.0)
 
-            # Access latest_capture without global (we only read it)
             if latest_capture:
                 img_path = os.path.join(app.config['UPLOAD_FOLDER'], latest_capture)
 
@@ -230,12 +210,9 @@ def tasks():
 
     return redirect(url_for('index'))
 
-
-
 @app.route('/health')
 def health():
-    return {'status': 'healthy'}, 200
-
+    return {'status': 'healthy', 'model_loaded': model is not None}, 200
 
 @app.teardown_appcontext
 def cleanup(error):
@@ -243,20 +220,17 @@ def cleanup(error):
     try:
         if camera is not None and camera.isOpened():
             camera.release()
-            camera = None  # ← FIX: This assignment satisfies linter
+            camera = None
     except Exception as e:
-        print(f"Camera cleanup error: {e}")
-
+        pass
 
 @app.errorhandler(404)
 def not_found(e):
     return render_template('index.html'), 404
 
-
 @app.errorhandler(500)
 def server_error(e):
     return render_template('index.html'), 500
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))

@@ -10,6 +10,7 @@ services:
     buildCommand: |
       pip install --upgrade pip
       pip install -r ../requirements.txt
+      startCommand: gunicorn -c frontend/gunicorn_config.py frontend.app:app
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 0 --workers 1 --threads 1 --worker-class sync --worker-tmp-dir /dev/shm
     envVars:
       - key: PYTHON_VERSION
