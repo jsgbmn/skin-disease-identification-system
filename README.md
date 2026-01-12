@@ -31,11 +31,4 @@ A simple web app that lets you upload a skin image (or use your webcam) and get 
 
 ---
 
-## Getting Started
 
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-```
