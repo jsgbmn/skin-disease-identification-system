@@ -1,7 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['OMP_NUM_THREADS'] = '1'
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 from flask import (
     Flask, flash, render_template, Response,
@@ -41,13 +40,6 @@ def get_model():
 
         tf.config.set_visible_devices([], 'GPU')
 
-        physical_devices = tf.config.list_physical_devices('CPU')
-        if physical_devices:
-            tf.config.set_logical_device_configuration(
-                physical_devices[0],
-                [tf.config.LogicalDeviceConfiguration(memory_limit=256)]
-            )
-
         gc.collect()
 
         model_path = app.config['MODEL_PATH']
@@ -58,8 +50,9 @@ def get_model():
         model.compile(optimizer='adam', loss='binary_crossentropy', run_eagerly=False)
 
         dummy = np.zeros((1, 256, 256, 3), dtype=np.float32)
-        model.predict(dummy, verbose=0)
+        model.predict(dummy, verbose=0, batch_size=1)
 
+        del dummy
         gc.collect()
 
     return model
@@ -82,6 +75,7 @@ def predict_path(img_path: str) -> str:
         with tf.device('/CPU:0'):
             pred = model.predict(new_image, verbose=0, batch_size=1)[0][0]
 
+        del new_image
         gc.collect()
 
         if pred < 0.5:
