@@ -29,7 +29,6 @@
             display: none !important;
         }
 
-        /* Header animation */
         .header-animate {
             animation: fadeInUp 0.8s ease-out forwards;
         }
@@ -46,7 +45,6 @@
             }
         }
 
-        /* Marquee animation */
         @keyframes marquee {
             0% {
                 transform: translateX(0);
@@ -80,7 +78,6 @@
             animation-play-state: paused;
         }
 
-        /* Fade out animation for rows */
         .testimonial-row {
             opacity: 0;
             animation: fadeIn 0.6s ease-out forwards;
@@ -104,24 +101,19 @@
 
 <body class="bg-gradient-to-b from-[#fafafa] to-[#f5f5f5]">
 
-    <!-- Include Navbar -->
     {% include 'navbar.html' %}
 
-    <!-- Testimonials Section -->
     <section id="about" class="relative min-h-screen flex items-center justify-center overflow-hidden py-24">
-        <!-- Background Blobs -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
             <div class="absolute top-1/4 -right-32 w-96 h-96 rounded-full bg-[#14b8a6]/15 blur-3xl"></div>
             <div class="absolute bottom-1/4 -left-32 w-80 h-80 rounded-full bg-[#fef3c7]/30 blur-3xl"></div>
         </div>
 
-        <!-- Grid Pattern -->
         <div class="absolute inset-0 opacity-[0.02] z-0"
             style="background-image: linear-gradient(#0a0a0a 1px, transparent 1px), linear-gradient(90deg, #0a0a0a 1px, transparent 1px); background-size: 60px 60px;">
         </div>
 
         <div class="relative z-10 w-full">
-            <!-- Section Header -->
             <div class="text-center max-w-2xl mx-auto mb-16 px-6">
                 <span
                     class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0fdfa] border border-[#14b8a6]/20 mb-8 text-sm font-light text-[#14b8a6] header-animate">
@@ -135,22 +127,20 @@
 
                 <h2 class="text-5xl md:text-6xl lg:text-7xl font-light text-[#0a0a0a] mb-6 leading-tight header-animate"
                     style="animation-delay: 0.1s;">
-                    Trusted by researchers and
+                    Trusted by our
                     <span class="relative inline-block font-normal">
-                        users
+                        community
                         <span class="absolute -bottom-2 left-0 right-0 h-1 bg-[#14b8a6]/30"></span>
                     </span>
                 </h2>
 
                 <p class="text-lg md:text-xl text-[#737373] leading-relaxed font-light header-animate"
                     style="animation-delay: 0.2s;">
-                    From thesis advisors to early adopters, see what people are saying about SKIN.
+                    Real feedback from advisors, researchers, and early users who helped shape SKIN.
                 </p>
             </div>
 
-            <!-- Marquee Container -->
             <div class="relative">
-                <!-- Gradient masks -->
                 <div
                     class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#fafafa] to-transparent z-10 pointer-events-none">
                 </div>
@@ -158,9 +148,8 @@
                     class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#fafafa] to-transparent z-10 pointer-events-none">
                 </div>
 
-                <!-- First row -->
+                <!-- First Row -->
                 <div class="testimonial-row flex gap-6 mb-6 marquee-row whitespace-nowrap">
-                    <!-- Testimonial 1 -->
                     <div
                         class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
                         <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
@@ -170,91 +159,17 @@
                             </path>
                         </svg>
                         <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "Revolutionary CNN for public health. This capstone project showcases exactly what AI can do
-                            for preventive medicine."
+                            "This project shows real promise for public health applications. The team did excellent work
+                            integrating CNN models for practical use."
                         </p>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                SC
+                                GP
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">Dr. Sarah Chen</div>
-                                <div class="text-xs font-light text-gray-500">Thesis Advisor, Stanford</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Testimonial 2 -->
-                    <div
-                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
-                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "Detected my lesion early — literal life-saver! The interface is so simple, I just uploaded
-                            a photo and got results in seconds."
-                        </p>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                MJ
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Marcus Johnson</div>
-                                <div class="text-xs font-light text-gray-500">Early Adopter</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Testimonial 3 -->
-                    <div
-                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
-                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "As accurate as professional diagnostic tools. Impressive accuracy for a capstone project."
-                        </p>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                ER
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Dr. Emily Rodriguez</div>
-                                <div class="text-xs font-light text-gray-500">Dermatologist</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Duplicate testimonials for seamless loop -->
-                    <div
-                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
-                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "Revolutionary CNN for public health. This capstone project showcases exactly what AI can do
-                            for preventive medicine."
-                        </p>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                SC
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Dr. Sarah Chen</div>
-                                <div class="text-xs font-light text-gray-500">Thesis Advisor, Stanford</div>
+                                <div class="text-sm font-medium text-gray-900">Prof. Genevieve Pilongo</div>
+                                <div class="text-xs font-light text-gray-500">Thesis Advisor</div>
                             </div>
                         </div>
                     </div>
@@ -268,17 +183,17 @@
                             </path>
                         </svg>
                         <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "Detected my lesion early — literal life-saver! The interface is so simple, I just uploaded
-                            a photo and got results in seconds."
+                            "Impressive capstone work. The system architecture is solid and the UI is clean. Looking
+                            forward to seeing how this evolves."
                         </p>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                MJ
+                                RC
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">Marcus Johnson</div>
-                                <div class="text-xs font-light text-gray-500">Early Adopter</div>
+                                <div class="text-sm font-medium text-gray-900">Prof. Rhodessa Cascaro, DIT</div>
+                                <div class="text-xs font-light text-gray-500">CCIS Dean</div>
                             </div>
                         </div>
                     </div>
@@ -292,94 +207,17 @@
                             </path>
                         </svg>
                         <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "As accurate as professional diagnostic tools. Impressive accuracy for a capstone project."
+                            "The machine learning implementation is well-executed. Good balance between model complexity
+                            and practical performance."
                         </p>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                ER
+                                PC
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">Dr. Emily Rodriguez</div>
-                                <div class="text-xs font-light text-gray-500">Dermatologist</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Second row - reverse direction -->
-                <div class="testimonial-row flex gap-6 marquee-row-reverse whitespace-nowrap">
-                    <!-- Testimonial 4 -->
-                    <div
-                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
-                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "The progress tracking feature helped me monitor my treatment over 6 months. Invaluable for
-                            patient engagement."
-                        </p>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                JW
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">James Wilson</div>
-                                <div class="text-xs font-light text-gray-500">Healthcare Administrator</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Testimonial 5 -->
-                    <div
-                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
-                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "Finally, accessible skin cancer screening. This democratizes early detection for
-                            underserved communities."
-                        </p>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                AP
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Dr. Aisha Patel</div>
-                                <div class="text-xs font-light text-gray-500">Public Health Researcher</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Testimonial 6 -->
-                    <div
-                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
-                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
-                            </path>
-                        </svg>
-                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "The CNN architecture is brilliant. 95% accuracy on dermoscopic images rivals published
-                            research."
-                        </p>
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                ML
-                            </div>
-                            <div>
-                                <div class="text-sm font-medium text-gray-900">Prof. Michael Lee</div>
-                                <div class="text-xs font-light text-gray-500">ML Department Chair</div>
+                                <div class="text-sm font-medium text-gray-900">Prof. Patrick D. Cerna</div>
+                                <div class="text-xs font-light text-gray-500">ML Course Instructor</div>
                             </div>
                         </div>
                     </div>
@@ -394,17 +232,17 @@
                             </path>
                         </svg>
                         <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "The progress tracking feature helped me monitor my treatment over 6 months. Invaluable for
-                            patient engagement."
+                            "This project shows real promise for public health applications. The team did excellent work
+                            integrating CNN models for practical use."
                         </p>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                JW
+                                GP
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">James Wilson</div>
-                                <div class="text-xs font-light text-gray-500">Healthcare Administrator</div>
+                                <div class="text-sm font-medium text-gray-900">Prof. Genevieve Pilongo</div>
+                                <div class="text-xs font-light text-gray-500">Thesis Advisor</div>
                             </div>
                         </div>
                     </div>
@@ -418,17 +256,17 @@
                             </path>
                         </svg>
                         <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "Finally, accessible skin cancer screening. This democratizes early detection for
-                            underserved communities."
+                            "Impressive capstone work. The system architecture is solid and the UI is clean. Looking
+                            forward to seeing how this evolves."
                         </p>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                AP
+                                RC
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">Dr. Aisha Patel</div>
-                                <div class="text-xs font-light text-gray-500">Public Health Researcher</div>
+                                <div class="text-sm font-medium text-gray-900">Prof. Rhodessa Cascaro, DIT</div>
+                                <div class="text-xs font-light text-gray-500">CCIS Dean</div>
                             </div>
                         </div>
                     </div>
@@ -442,23 +280,172 @@
                             </path>
                         </svg>
                         <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
-                            "The CNN architecture is brilliant. 95% accuracy on dermoscopic images rivals published
-                            research."
+                            "The machine learning implementation is well-executed. Good balance between model complexity
+                            and practical performance."
                         </p>
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
-                                ML
+                                PC
                             </div>
                             <div>
-                                <div class="text-sm font-medium text-gray-900">Prof. Michael Lee</div>
-                                <div class="text-xs font-light text-gray-500">ML Department Chair</div>
+                                <div class="text-sm font-medium text-gray-900">Prof. Patrick D. Cerna</div>
+                                <div class="text-xs font-light text-gray-500">ML Course Instructor</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Second Row -->
+                <div class="testimonial-row flex gap-6 marquee-row-reverse whitespace-nowrap">
+                    <div
+                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
+                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
+                            "Solid proof of concept. The deployment on Render works smoothly, and the code quality shows
+                            good software engineering practices."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
+                                MB
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">Martzel Baste</div>
+                                <div class="text-xs font-light text-gray-500">Software Developer</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
+                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
+                            "Helped review the methodology during defense. The research approach is thorough and the
+                            documentation is comprehensive."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
+                                CD
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">Christopher Josh Dellosa</div>
+                                <div class="text-xs font-light text-gray-500">Research Panelist</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
+                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
+                            "Tried the beta version during testing phase. Interface is intuitive and the results came
+                            back quickly. Interesting project!"
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
+                                JG
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">Joan Gumban</div>
+                                <div class="text-xs font-light text-gray-500">Beta Tester</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duplicates -->
+                    <div
+                        class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
+                        <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                            </path>
+                        </svg>
+                        <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
+                            "Solid proof of concept. The deployment on Render works smoothly, and the code quality shows
+                            good software engineering practices."
+                        </p>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
+                                MB
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900">Prof Martzel Baste</div>
+                                <div class="text-xs font-light text-gray-500">Software Developer Advisor< /div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
+                            <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                </path>
+                            </svg>
+                            <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
+                                "Helped review the methodology during defense. The research approach is thorough and the
+                                documentation is comprehensive."
+                            </p>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
+                                    CD
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">Christopher Josh Dellosa</div>
+                                    <div class="text-xs font-light text-gray-500">Research Panelist</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="inline-block flex-shrink-0 w-80 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 group">
+                            <svg class="w-6 h-6 text-[#14b8a6]/30 mb-4" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z">
+                                </path>
+                            </svg>
+                            <p class="text-base font-light text-gray-900 leading-relaxed mb-6 italic whitespace-normal">
+                                "Tried the beta version during testing phase. Interface is intuitive and the results
+                                came
+                                back quickly. Interesting project!"
+                            </p>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gradient-to-br from-[#14b8a6] to-[#0d9488] flex items-center justify-center text-sm font-medium text-white">
+                                    JG
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900">Joan Gumban</div>
+                                    <div class="text-xs font-light text-gray-500">Beta Tester</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
 </body>
