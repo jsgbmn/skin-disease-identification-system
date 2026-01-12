@@ -1,0 +1,10 @@
+name: skin-disease-identification
+dependencies:
+  - python=3.9
+  - pip
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - pip:
+      - any-other-needed-pip-package
