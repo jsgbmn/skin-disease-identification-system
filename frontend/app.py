@@ -1,6 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 from flask import (
     Flask, flash, render_template, Response,
@@ -10,6 +11,7 @@ import datetime
 import cv2
 import numpy as np
 from werkzeug.utils import secure_filename
+import gc
 
 UPLOAD_FOLDER = './static/Data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
@@ -17,7 +19,7 @@ MODEL_PATH = os.environ.get('MODEL_PATH', '../backend/models/model.h5')
 
 app = Flask(__name__, template_folder="templates")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 app.config['MODEL_PATH'] = MODEL_PATH
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production-2026')
 
@@ -34,27 +36,32 @@ def allowed_file(filename: str) -> bool:
 def get_model():
     global model
     if model is None:
-        try:
-            import tensorflow as tf
-            from tensorflow.keras.models import load_model
-            import gc
+        import tensorflow as tf
+        from tensorflow.keras.models import load_model
 
-            tf.config.set_visible_devices([], 'GPU')
+        tf.config.set_visible_devices([], 'GPU')
 
-            gc.collect()
+        physical_devices = tf.config.list_physical_devices('CPU')
+        if physical_devices:
+            tf.config.set_logical_device_configuration(
+                physical_devices[0],
+                [tf.config.LogicalDeviceConfiguration(memory_limit=256)]
+            )
 
-            model_path = app.config['MODEL_PATH']
-            if not os.path.exists(model_path):
-                raise FileNotFoundError(f"Model not found: {model_path}")
+        gc.collect()
 
-            model = load_model(model_path, compile=False)
-            model.compile(optimizer='adam', loss='binary_crossentropy')
+        model_path = app.config['MODEL_PATH']
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model not found: {model_path}")
 
-            model.predict(np.zeros((1, 256, 256, 3)), verbose=0)
+        model = load_model(model_path, compile=False)
+        model.compile(optimizer='adam', loss='binary_crossentropy', run_eagerly=False)
 
-            gc.collect()
-        except Exception as e:
-            raise RuntimeError(f"Model loading failed: {e}")
+        dummy = np.zeros((1, 256, 256, 3), dtype=np.float32)
+        model.predict(dummy, verbose=0)
+
+        gc.collect()
+
     return model
 
 def load_image(img_path: str) -> np.ndarray:
@@ -62,20 +69,27 @@ def load_image(img_path: str) -> np.ndarray:
     img = image.load_img(img_path, target_size=(256, 256))
     img_tensor = image.img_to_array(img)
     img_tensor = np.expand_dims(img_tensor, axis=0)
-    img_tensor = img_tensor / 255.0
+    img_tensor = img_tensor.astype(np.float32) / 255.0
     return img_tensor
 
 def predict_path(img_path: str) -> str:
     try:
+        import tensorflow as tf
+
         get_model()
         new_image = load_image(img_path)
-        pred = model.predict(new_image, verbose=0)[0][0]
+
+        with tf.device('/CPU:0'):
+            pred = model.predict(new_image, verbose=0, batch_size=1)[0][0]
+
+        gc.collect()
 
         if pred < 0.5:
             return f"Skin Disease Detected (Confidence: {(1-pred)*100:.1f}%) - Please consult a dermatologist."
         else:
             return f"No Skin Disease Detected (Confidence: {pred*100:.1f}%) - Regular checkups recommended."
     except Exception as e:
+        gc.collect()
         return f"Analysis error: {str(e)}"
 
 def init_camera():
@@ -168,6 +182,8 @@ def predicts():
         except Exception as e:
             flash(f'Error: {str(e)}')
             return redirect(url_for('index'))
+        finally:
+            gc.collect()
 
     flash('Invalid file type')
     return redirect(url_for('index'))
@@ -213,9 +229,14 @@ def tasks():
 @app.route('/health')
 def health():
     try:
+        import psutil
+        process = psutil.Process()
+        memory_info = process.memory_info()
+
         status = {
             'status': 'healthy',
             'model_loaded': model is not None,
+            'memory_mb': round(memory_info.rss / 1024 / 1024, 2),
             'timestamp': datetime.datetime.now().isoformat()
         }
         return status, 200
