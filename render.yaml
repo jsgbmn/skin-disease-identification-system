@@ -10,7 +10,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.9.18
       - key: MODEL_PATH
-        value: backend/models/model.h5
+        value: backend/models/model.tflite
       - key: TF_CPP_MIN_LOG_LEVEL
         value: 3
       - key: FLASK_ENV

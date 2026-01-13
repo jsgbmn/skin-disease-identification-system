@@ -1,6 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '2'
 
 from flask import (
     Flask, flash, render_template, Response,
@@ -14,7 +14,7 @@ import gc
 
 UPLOAD_FOLDER = './static/Data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
-MODEL_PATH = os.environ.get('MODEL_PATH', '../backend/models/model.h5')
+MODEL_PATH = os.environ.get('MODEL_PATH', '../backend/models/model.tflite')
 
 app = Flask(__name__, template_folder="templates")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -24,7 +24,9 @@ app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-product
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-model = None
+interpreter = None
+input_details = None
+output_details = None
 capture = 0
 camera = None
 latest_capture = None
@@ -33,12 +35,9 @@ def allowed_file(filename: str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def get_model():
-    global model
-    if model is None:
+    global interpreter, input_details, output_details
+    if interpreter is None:
         import tensorflow as tf
-        from tensorflow.keras.models import load_model
-
-        tf.config.set_visible_devices([], 'GPU')
 
         gc.collect()
 
@@ -46,34 +45,50 @@ def get_model():
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model not found: {model_path}")
 
-        model = load_model(model_path, compile=False)
-        model.compile(optimizer='adam', loss='binary_crossentropy', run_eagerly=False)
+        # Load TFLite model
+        interpreter = tf.lite.Interpreter(model_path=model_path)
+        interpreter.allocate_tensors()
 
+        # Get input and output details
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+
+        # Warm-up prediction
         dummy = np.zeros((1, 256, 256, 3), dtype=np.float32)
-        model.predict(dummy, verbose=0, batch_size=1)
+        interpreter.set_tensor(input_details[0]['index'], dummy)
+        interpreter.invoke()
 
         del dummy
         gc.collect()
 
-    return model
+        print("✅ TFLite model loaded and warmed up")
+
+    return interpreter, input_details, output_details
 
 def load_image(img_path: str) -> np.ndarray:
-    from tensorflow.keras.preprocessing import image
-    img = image.load_img(img_path, target_size=(256, 256))
-    img_tensor = image.img_to_array(img)
-    img_tensor = np.expand_dims(img_tensor, axis=0)
-    img_tensor = img_tensor.astype(np.float32) / 255.0
-    return img_tensor
+    from PIL import Image
+    img = Image.open(img_path).convert('RGB')
+    img = img.resize((256, 256))
+    img_array = np.array(img, dtype=np.float32)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = img_array / 255.0
+    return img_array
 
 def predict_path(img_path: str) -> str:
     try:
-        import tensorflow as tf
+        import time
+        start = time.time()
 
-        get_model()
+        interp, inp_details, out_details = get_model()
         new_image = load_image(img_path)
 
-        with tf.device('/CPU:0'):
-            pred = model.predict(new_image, verbose=0, batch_size=1)[0][0]
+        # Run inference
+        interp.set_tensor(inp_details[0]['index'], new_image)
+        interp.invoke()
+        pred = interp.get_tensor(out_details[0]['index'])[0][0]
+
+        elapsed = time.time() - start
+        print(f"⚡ TFLite prediction: {elapsed:.2f}s")
 
         del new_image
         gc.collect()
@@ -229,7 +244,7 @@ def health():
 
         status = {
             'status': 'healthy',
-            'model_loaded': model is not None,
+            'model_loaded': interpreter is not None,
             'memory_mb': round(memory_info.rss / 1024 / 1024, 2),
             'timestamp': datetime.datetime.now().isoformat()
         }
@@ -254,6 +269,13 @@ def not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return render_template('index.html'), 500
+
+# Pre-load model at startup
+with app.app_context():
+    try:
+        get_model()
+    except Exception as e:
+        print(f"⚠️ Model pre-loading failed: {e}")
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
