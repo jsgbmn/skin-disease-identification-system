@@ -12,15 +12,37 @@ import cv2
 import numpy as np
 from werkzeug.utils import secure_filename
 import gc
+from pathlib import Path
 
 # ========== CONFIGURATION ==========
 UPLOAD_FOLDER = './static/Data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 
+# ✅ Smart model directory finder
+def find_models_dir():
+    """Find models directory regardless of where app.py is located"""
+    app_path = Path(__file__).resolve()
+
+    # Check multiple possible locations
+    candidates = [
+        app_path.parent / 'backend' / 'models',  # app.py in root
+        app_path.parent.parent / 'backend' / 'models',  # app.py in subdirectory
+    ]
+
+    for path in candidates:
+        if path.exists() and any(path.glob('*.h5')) or any(path.glob('*.tflite')):
+            return path
+
+    # Default fallback
+    return candidates[0]
+
+MODELS_DIR = find_models_dir()
+MODELS_DIR.mkdir(parents=True, exist_ok=True)
+
 # ✅ Multiple model configurations with correct paths
 MODELS = {
     'ham10000': {
-        'path': '../backend/models/HAM10000_MobileNetV2_TF2_15.h5',
+        'path': str(MODELS_DIR / 'HAM10000_MobileNetV2_TF2_15.h5'),
         'type': 'h5',
         'classes': ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'],
         'descriptions': {
@@ -41,7 +63,7 @@ MODELS = {
         'name': 'HAM10000 Skin Lesion Classifier'
     },
     'monkeypox': {
-        'path': '../backend/models/model.tflite',
+        'path': str(MODELS_DIR / 'model.tflite'),
         'type': 'tflite',
         'classes': ['Monkeypox', 'Others'],
         'descriptions': {
@@ -53,11 +75,10 @@ MODELS = {
             'Others': 95.0
         },
         'overall_accuracy': 95.0,
-        'input_size': 256,  # ✅ Changed from 224 to 256
+        'input_size': 256,
         'name': 'Monkeypox Detection System'
     }
 }
-
 
 app = Flask(__name__, template_folder="templates")
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -73,8 +94,74 @@ camera = None
 latest_capture = None
 
 # ========== HELPER FUNCTIONS ==========
+
+# ✅ ADD format_error FUNCTION FIRST
+def format_error(error_message: str) -> str:
+    """Format error messages with consistent styling"""
+    return f"""
+    <div style='max-width: 600px; width: 100%; margin: 0 auto; padding: 20px; box-sizing: border-box; text-align: center;'>
+        <div style='background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+                    padding: 24px; border-radius: 16px; border-left: 4px solid #dc2626;'>
+            <div style='display: flex; flex-direction: column; align-items: center; gap: 16px;'>
+                <svg style='width: 56px; height: 56px; color: #dc2626;' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2'
+                          d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'/>
+                </svg>
+                <div>
+                    <h3 style='font-size: 20px; font-weight: 600; color: #7f1d1d; margin: 0 0 8px 0;'>
+                        Analysis Error
+                    </h3>
+                    <p style='font-size: 14px; color: #991b1b; margin: 0; line-height: 1.6;'>
+                        {error_message}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div style='margin-top: 20px; text-align: center;'>
+            <button onclick='window.location.href="/"'
+                    style='padding: 12px 24px; background: linear-gradient(to right, #14b8a6, #0d9488);
+                           color: white; border: none; border-radius: 10px; font-size: 14px;
+                           font-weight: 500; cursor: pointer; transition: all 0.3s;'>
+                Try Another Image
+            </button>
+        </div>
+    </div>
+    """
+
 def allowed_file(filename: str) -> bool:
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def init_camera():
+    """Initialize camera with error handling"""
+    global camera
+
+    if camera is not None and camera.isOpened():
+        return True
+
+    try:
+        camera = cv2.VideoCapture(0)
+        if not camera.isOpened():
+            print("⚠️ Camera not available")
+            return False
+
+        # Set camera properties
+        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        camera.set(cv2.CAP_PROP_FPS, 30)
+
+        # Test read
+        ret, _ = camera.read()
+        if not ret:
+            camera.release()
+            camera = None
+            return False
+
+        print("📷 Camera initialized successfully")
+        return True
+    except Exception as e:
+        print(f"❌ Camera initialization failed: {e}")
+        camera = None
+        return False
 
 def get_model(model_type: str):
     """Load and cache model (H5 or TFLite) with multiple fallback strategies"""
@@ -170,7 +257,6 @@ def get_model(model_type: str):
 
     return loaded_models[model_type]
 
-
 def load_with_tf1_compat(model_path):
     """Try loading with TF1 compatibility mode"""
     import tensorflow as tf
@@ -259,7 +345,8 @@ def predict_path(img_path: str, model_type: str) -> str:
         error_details = traceback.format_exc()
         print(f"❌ Prediction error:\n{error_details}")
         gc.collect()
-        return f"<div style='background: #f8d7da; padding: 15px; border-radius: 10px; color: #721c24;'><b>Analysis error:</b> {str(e)}</div>"
+        return format_error(str(e))
+
 def format_prediction_result(predictions: np.ndarray, model_config: dict, model_type: str) -> str:
     """Format prediction results with perfect centering"""
 
@@ -511,7 +598,6 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
 
     return result
 
-
 def gen_frames():
     """Generate camera frames for video feed"""
     global capture, latest_capture
@@ -595,7 +681,6 @@ def gen_frames():
             import time
             time.sleep(0.1)
             continue
-
 
 def release_camera():
     """Safely release camera resources"""
@@ -724,7 +809,6 @@ def tasks():
 
     return redirect(url_for('index'))
 
-
 @app.route('/health')
 def health():
     try:
@@ -741,7 +825,8 @@ def health():
                     'type': config['type'],
                     'accuracy': config['overall_accuracy'],
                     'classes': len(config['classes']),
-                    'path': config['path']
+                    'path': config['path'],
+                    'exists': os.path.exists(config['path'])
                 }
                 for name, config in MODELS.items()
             },
@@ -775,14 +860,20 @@ with app.app_context():
     print("\n" + "="*60)
     print("🚀 MULTI-DISEASE SKIN CLASSIFIER")
     print("="*60)
+    print(f"\n📁 Models Directory: {MODELS_DIR}")
+    print(f"📁 Models dir exists: {MODELS_DIR.exists()}")
     print("\n📋 Available Models:")
     for name, config in MODELS.items():
-        exists = "✅" if os.path.exists(config['path']) else "❌"
+        path = Path(config['path'])
+        exists = "✅" if path.exists() else "❌"
         print(f"   {exists} {config['name']}")
         print(f"     Type: {config['type'].upper()}")
         print(f"     Accuracy: {config['overall_accuracy']}%")
         print(f"     Classes: {len(config['classes'])}")
         print(f"     Path: {config['path']}")
+        if exists:
+            size_mb = path.stat().st_size / (1024 * 1024)
+            print(f"     Size: {size_mb:.2f} MB")
     print("\n💡 Models will load on first prediction")
     print("="*60 + "\n")
 
