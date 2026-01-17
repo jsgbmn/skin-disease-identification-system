@@ -261,8 +261,9 @@ def predict_path(img_path: str, model_type: str) -> str:
         gc.collect()
         return f"<div style='background: #f8d7da; padding: 15px; border-radius: 10px; color: #721c24;'><b>Analysis error:</b> {str(e)}</div>"
 def format_prediction_result(predictions: np.ndarray, model_config: dict, model_type: str) -> str:
-    """Format prediction results with mobile-responsive styling"""
+    """Format prediction results with perfect centering"""
 
+    # Validation checks
     if predictions is None or len(predictions) == 0:
         return format_error("Empty predictions received from model")
 
@@ -289,57 +290,52 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
     description = descriptions[pred_class]
     class_acc = accuracies[pred_class]
 
-    # ✅ Mobile-first responsive container
+    # ✅ PERFECTLY CENTERED CONTAINER
     result = """
-    <div style='max-width: 100%; width: 100%; padding: 0 4px;'>
+    <div style='max-width: 600px; width: 100%; margin: 0 auto; padding: 0 20px; box-sizing: border-box; text-align: center;'>
     """
 
-    # ✅ Model badge - responsive
+    # ✅ Model badge - centered
     result += f"""
-    <div style='display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 16px;
-                background: #f0fdfa; border: 1px solid rgba(20, 184, 166, 0.2); margin-bottom: 16px;
-                font-size: 11px;'>
-        <svg style='width: 12px; height: 12px; color: #14b8a6; flex-shrink: 0;' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+    <div style='display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px;
+                background: #f0fdfa; border: 1px solid rgba(20, 184, 166, 0.2); margin-bottom: 24px;'>
+        <svg style='width: 14px; height: 14px; color: #14b8a6; flex-shrink: 0;' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
             <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2'
                   d='M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'/>
         </svg>
-        <span style='font-weight: 400; color: #14b8a6; white-space: nowrap;'>{model_config['name']}</span>
+        <span style='font-size: 13px; font-weight: 400; color: #14b8a6; white-space: nowrap;'>{model_config['name']}</span>
     </div>
     """
 
-    # ✅ Primary diagnosis - mobile optimized
+    # ✅ Diagnosis - centered
     result += f"""
-    <div style='margin-bottom: 20px;'>
-        <div style='display: flex; align-items: flex-start; justify-content: space-between;
-                    margin-bottom: 12px; gap: 12px; flex-wrap: wrap;'>
-            <div style='flex: 1; min-width: 0;'>
-                <h3 style='font-size: 20px; font-weight: 400; color: #0a0a0a; margin: 0 0 6px 0;
-                           letter-spacing: -0.3px; line-height: 1.2; word-wrap: break-word;'>
-                    {description}
-                </h3>
-                <p style='font-size: 12px; color: #737373; margin: 0; font-weight: 300; line-height: 1.4;'>
-                    Accuracy: {class_acc}% • Confidence: {confidence:.1f}%
-                </p>
-            </div>
-            <div style='text-align: right; flex-shrink: 0; align-self: flex-start;'>
-                <div style='font-size: 36px; font-weight: 300; color: #14b8a6; line-height: 1;'>
-                    {confidence:.1f}<span style='font-size: 18px; color: #737373;'>%</span>
-                </div>
-            </div>
-        </div>
+    <h3 style='font-size: 24px; font-weight: 400; color: #0a0a0a; margin: 0 0 8px 0;
+               letter-spacing: -0.5px; line-height: 1.3; text-align: center;'>
+        {description}
+    </h3>
+    <p style='font-size: 13px; color: #737373; margin: 0 0 16px 0; font-weight: 300; line-height: 1.5; text-align: center;'>
+        Accuracy: {class_acc}% • Confidence: {confidence:.1f}%
+    </p>
+
+    <div style='font-size: 56px; font-weight: 300; color: #14b8a6; line-height: 1; margin-bottom: 24px; text-align: center;'>
+        {confidence:.1f}<span style='font-size: 28px; color: #737373;'>%</span>
+    </div>
     """
 
-    # ✅ Risk assessment - mobile responsive
+    # ✅ Risk assessment - centered
     if model_type == 'ham10000':
         if pred_class in ['mel', 'bcc']:
             result += """
             <div style='background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-                        padding: 12px 14px; border-radius: 10px; border-left: 3px solid #dc2626;'>
-                <div style='display: flex; align-items: flex-start; gap: 10px;'>
-                    <span style='font-size: 18px; flex-shrink: 0; line-height: 1;'>⚠️</span>
+                        padding: 16px 20px; border-radius: 12px; border-left: 4px solid #dc2626;
+                        margin-bottom: 24px; text-align: left;'>
+                <div style='display: flex; align-items: flex-start; gap: 12px;'>
+                    <span style='font-size: 20px; flex-shrink: 0; line-height: 1;'>⚠️</span>
                     <div style='flex: 1; min-width: 0;'>
-                        <p style='margin: 0; font-size: 13px; font-weight: 600; color: #7f1d1d; line-height: 1.3;'>HIGH RISK</p>
-                        <p style='margin: 4px 0 0 0; font-size: 12px; font-weight: 400; color: #991b1b; line-height: 1.4;'>
+                        <p style='margin: 0; font-size: 14px; font-weight: 600; color: #7f1d1d; line-height: 1.4;'>
+                            HIGH RISK
+                        </p>
+                        <p style='margin: 6px 0 0 0; font-size: 13px; font-weight: 400; color: #991b1b; line-height: 1.6;'>
                             Immediate dermatologist consultation strongly recommended.
                         </p>
                     </div>
@@ -349,13 +345,16 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
         elif pred_class in ['akiec', 'df']:
             result += """
             <div style='background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-                        padding: 12px 14px; border-radius: 10px; border-left: 3px solid #f59e0b;'>
-                <div style='display: flex; align-items: flex-start; gap: 10px;'>
-                    <span style='font-size: 18px; flex-shrink: 0; line-height: 1;'>⚠️</span>
+                        padding: 16px 20px; border-radius: 12px; border-left: 4px solid #f59e0b;
+                        margin-bottom: 24px; text-align: left;'>
+                <div style='display: flex; align-items: flex-start; gap: 12px;'>
+                    <span style='font-size: 20px; flex-shrink: 0; line-height: 1;'>⚠️</span>
                     <div style='flex: 1; min-width: 0;'>
-                        <p style='margin: 0; font-size: 13px; font-weight: 600; color: #78350f; line-height: 1.3;'>MODERATE RISK</p>
-                        <p style='margin: 4px 0 0 0; font-size: 12px; font-weight: 400; color: #92400e; line-height: 1.4;'>
-                            Schedule checkup within 2-4 weeks.
+                        <p style='margin: 0; font-size: 14px; font-weight: 600; color: #78350f; line-height: 1.4;'>
+                            MODERATE RISK
+                        </p>
+                        <p style='margin: 6px 0 0 0; font-size: 13px; font-weight: 400; color: #92400e; line-height: 1.6;'>
+                            Schedule dermatologist checkup within 2-4 weeks.
                         </p>
                     </div>
                 </div>
@@ -364,13 +363,16 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
         else:
             result += """
             <div style='background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-                        padding: 12px 14px; border-radius: 10px; border-left: 3px solid #16a34a;'>
-                <div style='display: flex; align-items: flex-start; gap: 10px;'>
-                    <span style='font-size: 18px; flex-shrink: 0; line-height: 1;'>✅</span>
+                        padding: 16px 20px; border-radius: 12px; border-left: 4px solid #16a34a;
+                        margin-bottom: 24px; text-align: left;'>
+                <div style='display: flex; align-items: flex-start; gap: 12px;'>
+                    <span style='font-size: 20px; flex-shrink: 0; line-height: 1;'>✅</span>
                     <div style='flex: 1; min-width: 0;'>
-                        <p style='margin: 0; font-size: 13px; font-weight: 600; color: #14532d; line-height: 1.3;'>LOW RISK</p>
-                        <p style='margin: 4px 0 0 0; font-size: 12px; font-weight: 400; color: #166534; line-height: 1.4;'>
-                            Continue monitoring. Consult if changes occur.
+                        <p style='margin: 0; font-size: 14px; font-weight: 600; color: #14532d; line-height: 1.4;'>
+                            LOW RISK
+                        </p>
+                        <p style='margin: 6px 0 0 0; font-size: 13px; font-weight: 400; color: #166534; line-height: 1.6;'>
+                            Continue regular monitoring. Consult if changes occur.
                         </p>
                     </div>
                 </div>
@@ -381,13 +383,16 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
         if pred_class == 'Monkeypox':
             result += """
             <div style='background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-                        padding: 12px 14px; border-radius: 10px; border-left: 3px solid #dc2626;'>
-                <div style='display: flex; align-items: flex-start; gap: 10px;'>
-                    <span style='font-size: 18px; flex-shrink: 0; line-height: 1;'>⚠️</span>
+                        padding: 16px 20px; border-radius: 12px; border-left: 4px solid #dc2626;
+                        margin-bottom: 24px; text-align: left;'>
+                <div style='display: flex; align-items: flex-start; gap: 12px;'>
+                    <span style='font-size: 20px; flex-shrink: 0; line-height: 1;'>⚠️</span>
                     <div style='flex: 1; min-width: 0;'>
-                        <p style='margin: 0; font-size: 13px; font-weight: 600; color: #7f1d1d; line-height: 1.3;'>POSITIVE</p>
-                        <p style='margin: 4px 0 0 0; font-size: 12px; font-weight: 400; color: #991b1b; line-height: 1.4;'>
-                            Seek immediate medical attention. Isolate and contact healthcare.
+                        <p style='margin: 0; font-size: 14px; font-weight: 600; color: #7f1d1d; line-height: 1.4;'>
+                            POSITIVE DETECTION
+                        </p>
+                        <p style='margin: 6px 0 0 0; font-size: 13px; font-weight: 400; color: #991b1b; line-height: 1.6;'>
+                            Seek immediate medical attention. Isolate and contact healthcare provider.
                         </p>
                     </div>
                 </div>
@@ -396,28 +401,29 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
         else:
             result += """
             <div style='background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-                        padding: 12px 14px; border-radius: 10px; border-left: 3px solid #16a34a;'>
-                <div style='display: flex; align-items: flex-start; gap: 10px;'>
-                    <span style='font-size: 18px; flex-shrink: 0; line-height: 1;'>✅</span>
+                        padding: 16px 20px; border-radius: 12px; border-left: 4px solid #16a34a;
+                        margin-bottom: 24px; text-align: left;'>
+                <div style='display: flex; align-items: flex-start; gap: 12px;'>
+                    <span style='font-size: 20px; flex-shrink: 0; line-height: 1;'>✅</span>
                     <div style='flex: 1; min-width: 0;'>
-                        <p style='margin: 0; font-size: 13px; font-weight: 600; color: #14532d; line-height: 1.3;'>NEGATIVE</p>
-                        <p style='margin: 4px 0 0 0; font-size: 12px; font-weight: 400; color: #166534; line-height: 1.4;'>
-                            No monkeypox detected. Consult if symptoms persist.
+                        <p style='margin: 0; font-size: 14px; font-weight: 600; color: #14532d; line-height: 1.4;'>
+                            NEGATIVE
+                        </p>
+                        <p style='margin: 6px 0 0 0; font-size: 13px; font-weight: 400; color: #166534; line-height: 1.6;'>
+                            No monkeypox detected. Consult doctor if symptoms persist.
                         </p>
                     </div>
                 </div>
             </div>
             """
 
-    result += "</div>"
-
-    # ✅ Alternative predictions - mobile optimized
+    # ✅ Alternative predictions - left-aligned content, centered section
     if len(class_names) > 2:
         top_3_idx = np.argsort(predictions)[::-1][:3]
 
         result += """
-        <div style='margin-bottom: 20px;'>
-            <h4 style='font-size: 14px; font-weight: 500; color: #525252; margin: 0 0 12px 0;'>
+        <div style='margin-bottom: 24px; text-align: left;'>
+            <h4 style='font-size: 15px; font-weight: 500; color: #525252; margin: 0 0 16px 0;'>
                 Alternative Possibilities
             </h4>
         """
@@ -430,27 +436,29 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
 
             result += f"""
             <div style='display: flex; justify-content: space-between; align-items: center;
-                        padding: 10px 12px; margin-bottom: 6px; background: #fafafa;
-                        border-radius: 8px; border: 1px solid #f5f5f5; gap: 12px;'>
+                        padding: 12px 16px; margin-bottom: 8px; background: #fafafa;
+                        border-radius: 10px; border: 1px solid #f5f5f5; gap: 16px;'>
                 <div style='flex: 1; min-width: 0;'>
-                    <p style='margin: 0; font-size: 13px; font-weight: 400; color: #0a0a0a; line-height: 1.3;'>{alt_desc}</p>
-                    <p style='margin: 3px 0 0 0; font-size: 11px; font-weight: 300; color: #737373; line-height: 1.2;'>
+                    <p style='margin: 0; font-size: 14px; font-weight: 400; color: #0a0a0a; line-height: 1.4;'>
+                        {alt_desc}
+                    </p>
+                    <p style='margin: 4px 0 0 0; font-size: 12px; font-weight: 300; color: #737373; line-height: 1.3;'>
                         Accuracy: {alt_acc}%
                     </p>
                 </div>
-                <div style='font-size: 16px; font-weight: 400; color: #14b8a6; flex-shrink: 0; white-space: nowrap;'>
-                    {alt_conf:.1f}<span style='font-size: 12px; color: #737373;'>%</span>
+                <div style='font-size: 18px; font-weight: 400; color: #14b8a6; flex-shrink: 0; white-space: nowrap;'>
+                    {alt_conf:.1f}<span style='font-size: 13px; color: #737373;'>%</span>
                 </div>
             </div>
             """
 
         result += "</div>"
 
-    # ✅ Binary probabilities - mobile optimized
+    # ✅ Binary probabilities
     if len(class_names) == 2:
         result += """
-        <div style='margin-bottom: 20px;'>
-            <h4 style='font-size: 14px; font-weight: 500; color: #525252; margin: 0 0 12px 0;'>
+        <div style='margin-bottom: 24px; text-align: left;'>
+            <h4 style='font-size: 15px; font-weight: 500; color: #525252; margin: 0 0 16px 0;'>
                 Detection Probabilities
             </h4>
         """
@@ -468,29 +476,32 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
 
             result += f"""
             <div style='display: flex; justify-content: space-between; align-items: center;
-                        padding: 10px 12px; margin-bottom: 6px; border-radius: 8px; {bg_style} gap: 12px;'>
-                <p style='margin: 0; font-size: 13px; font-weight: 400; color: #0a0a0a; flex: 1; min-width: 0;'>{desc}</p>
-                <p style='margin: 0; font-size: 16px; font-weight: 400; color: {text_color}; flex-shrink: 0; white-space: nowrap;'>
-                    {prob:.1f}<span style='font-size: 12px;'>%</span>
+                        padding: 12px 16px; margin-bottom: 8px; border-radius: 10px; {bg_style} gap: 16px;'>
+                <p style='margin: 0; font-size: 14px; font-weight: 400; color: #0a0a0a; flex: 1; min-width: 0;'>
+                    {desc}
+                </p>
+                <p style='margin: 0; font-size: 18px; font-weight: 400; color: {text_color}; flex-shrink: 0; white-space: nowrap;'>
+                    {prob:.1f}<span style='font-size: 13px;'>%</span>
                 </p>
             </div>
             """
 
         result += "</div>"
 
-    # ✅ Disclaimer - mobile optimized
+    # ✅ Disclaimer
     result += f"""
     <div style='background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-                padding: 12px 14px; border-radius: 10px; border-left: 3px solid #f59e0b; margin-top: 20px;'>
-        <div style='display: flex; gap: 10px; align-items: flex-start;'>
-            <span style='font-size: 18px; flex-shrink: 0; line-height: 1;'>⚠️</span>
+                padding: 16px 20px; border-radius: 12px; border-left: 4px solid #f59e0b;
+                margin-top: 24px; text-align: left;'>
+        <div style='display: flex; gap: 12px; align-items: flex-start;'>
+            <span style='font-size: 20px; flex-shrink: 0; line-height: 1;'>⚠️</span>
             <div style='flex: 1; min-width: 0;'>
-                <p style='margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #78350f; line-height: 1.3;'>
+                <p style='margin: 0 0 6px 0; font-size: 13px; font-weight: 600; color: #78350f; line-height: 1.4;'>
                     Medical Disclaimer
                 </p>
-                <p style='margin: 0; font-size: 11px; font-weight: 400; color: #92400e; line-height: 1.5;'>
-                    This AI ({model_config['overall_accuracy']}% accuracy) is for screening only, NOT diagnosis.
-                    Always consult a healthcare provider.
+                <p style='margin: 0; font-size: 12px; font-weight: 400; color: #92400e; line-height: 1.6;'>
+                    This AI tool has {model_config['overall_accuracy']}% accuracy and is for educational/screening purposes only.
+                    It is NOT a diagnostic tool. Always consult a qualified healthcare provider for proper medical evaluation.
                 </p>
             </div>
         </div>
@@ -499,65 +510,6 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
     """
 
     return result
-
-
-
-# ========== CAMERA FUNCTIONS ==========
-# ========== CAMERA FUNCTIONS (IMPROVED) ==========
-def init_camera():
-    """Initialize camera with multiple fallback attempts"""
-    global camera
-
-    # Disable camera in production/cloud environments
-    if os.environ.get('RENDER') or os.environ.get('FLASK_ENV') == 'production':
-        print("⚠️ Camera disabled in production environment")
-        return False
-
-    try:
-        # If camera already open and working, return True
-        if camera is not None and camera.isOpened():
-            return True
-
-        # Close existing camera if not opened properly
-        if camera is not None:
-            camera.release()
-            camera = None
-
-        print("📷 Attempting to open camera...")
-
-        # Try multiple camera indices (0, 1, 2)
-        for index in [0, 1, 2]:
-            print(f"   Trying camera index {index}...")
-            test_camera = cv2.VideoCapture(index)
-
-            if test_camera.isOpened():
-                # Test if we can actually read a frame
-                ret, frame = test_camera.read()
-                if ret and frame is not None:
-                    print(f"   ✅ Camera {index} opened successfully!")
-                    camera = test_camera
-                    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-                    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-                    camera.set(cv2.CAP_PROP_FPS, 30)
-                    return True
-                else:
-                    test_camera.release()
-            else:
-                if test_camera is not None:
-                    test_camera.release()
-
-        print("❌ No working camera found")
-        return False
-
-    except Exception as e:
-        print(f"❌ Camera initialization error: {e}")
-        if camera is not None:
-            try:
-                camera.release()
-            except:
-                pass
-            camera = None
-        return False
 
 
 def gen_frames():

@@ -29,33 +29,7 @@
             }
         }
     </script>
-    <style>
-        /* Mobile result container fix */
-        #results {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-            box-sizing: border-box;
-        }
 
-        /* Ensure all result content is responsive */
-        #results * {
-            max-width: 100%;
-            box-sizing: border-box;
-            word-wrap: break-word;
-        }
-
-        /* Mobile typography */
-        @media (max-width: 640px) {
-            #results h3 {
-                font-size: 18px !important;
-            }
-
-            #results p {
-                font-size: 12px !important;
-            }
-        }
-    </style>
 
     <style>
         body {
@@ -393,6 +367,7 @@
                                         </label>
 
                                         <!-- Monkeypox Model -->
+                                        <!-- Monkeypox Model -->
                                         <label
                                             class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
                                             <input type="radio" name="model_type" value="monkeypox"
@@ -408,7 +383,8 @@
                                                         </path>
                                                     </svg>
                                                 </div>
-                                                <div class="flex-1 min-width: 0;">
+                                                <!-- ✅ FIXED: Changed min-width: 0; (colon) to min-width: 0; (semicolon) -->
+                                                <div class="flex-1 min-w-0;">
                                                     <h4 class="font-semibold text-gray-900 text-sm mb-1">Monkeypox</h4>
                                                     <p class="text-xs text-gray-600 mb-1">Binary virus detection</p>
                                                     <div class="flex items-center gap-2">
@@ -421,6 +397,7 @@
                                                 </div>
                                             </div>
                                         </label>
+
                                     </div>
                                 </div>
 
