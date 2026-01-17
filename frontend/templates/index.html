@@ -58,20 +58,40 @@
         html {
             scroll-behavior: smooth;
         }
+
+        .model-card {
+            transition: all 0.3s ease;
+        }
+
+        .model-card:has(input:checked) {
+            border-color: #14b8a6 !important;
+            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+            box-shadow: 0 4px 15px rgba(20, 184, 166, 0.2);
+        }
+
+        .model-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #video_feed {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
 <body class="bg-gradient-to-b from-[#fafafa] to-[#f5f5f5] antialiased" x-data="{
     uploadModal: false,
     captureModal: false,
-    uploadFormModal: false
+    uploadFormModal: false,
+    selectedModel: 'ham10000'
 }" :class="{ 'overflow-hidden h-screen': uploadModal || captureModal || uploadFormModal }">
 
     {% include 'navbar.html' %}
 
     <!-- Hero Section -->
     <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16">
-        <!-- Background Effects -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
             <div class="absolute top-1/4 -right-32 w-96 h-96 rounded-full bg-[#14b8a6]/20 blur-3xl"></div>
             <div class="absolute bottom-1/4 -left-32 w-80 h-80 rounded-full bg-[#fef3c7]/40 blur-3xl"></div>
@@ -91,29 +111,29 @@
                             d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
                         </path>
                     </svg>
-                    <span class="text-sm font-light text-[#14b8a6]">CNN-Powered Detection</span>
+                    <span class="text-sm font-light text-[#14b8a6]">Multi-Model CNN Detection</span>
                 </div>
 
-                <!-- Headline -->
+                <!-- ✅ UPDATED: Headline -->
                 <h1 class="text-5xl md:text-6xl lg:text-7xl font-light text-[#0a0a0a] mb-6 leading-tight">
-                    Reduce Skin Lesion Infections with
+                    Reduce Skin Cancer Infections with
                     <span class="relative inline-block font-normal">
                         AI Precision
                         <span class="absolute -bottom-2 left-0 right-0 h-1 bg-[#14b8a6]/30"></span>
                     </span>
                 </h1>
 
-                <!-- Subheadline -->
+                <!-- ✅ UPDATED: Subheadline -->
                 <p class="text-lg md:text-xl text-[#737373] max-w-2xl mx-auto mb-12 font-light leading-relaxed">
-                    Powered by Convolutional Neural Networks — Early detection from any photo, anywhere. 95% accuracy
-                    for melanoma, basal cell, and more.
+                    Powered by Convolutional Neural Networks — Detect skin cancer lesions or Monkeypox from any photo,
+                    anywhere. Up to 95% accuracy.
                 </p>
+
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
                     <button @click="uploadModal = true"
                         class="group relative overflow-visible px-6 py-3 rounded-full bg-[#f0fdfa] border border-[#14b8a6]/20 hover:border-[#14b8a6]/40 hover:bg-[#e6fcf9] transition-all duration-300 transform hover:scale-105">
 
-                        <!-- Sparkle Effects -->
                         <div class="absolute inset-0 pointer-events-none">
                             <div class="absolute -top-1 left-4 w-1.5 h-1.5 bg-[#14b8a6] rounded-full animate-ping">
                             </div>
@@ -133,7 +153,6 @@
                                 style="animation-delay: 0.8s;"></div>
                         </div>
 
-                        <!-- Button Content -->
                         <div class="relative flex items-center gap-2 z-10">
                             <svg class="w-4 h-4 text-[#14b8a6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -143,18 +162,13 @@
                             <span class="text-sm font-normal text-[#14b8a6]">Scan Your Skin</span>
                         </div>
                     </button>
-
                 </div>
 
-
-
-
-
                 {% if user_image or product %}
+                <!-- Results Section -->
                 <div id="results"
                     class="mb-12 sm:mb-16 bg-white rounded-2xl shadow-xl p-6 sm:p-8 border-2 border-[#14b8a6] scroll-mt-24 mx-4 sm:mx-0">
                     <div class="text-center">
-                        <!-- Success Icon -->
                         <div
                             class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-[#14b8a6]/10 to-[#14b8a6]/20 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
                             <svg class="w-8 h-8 sm:w-10 sm:h-10 text-[#14b8a6]" fill="none" stroke="currentColor"
@@ -178,14 +192,13 @@
                             class="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl sm:rounded-2xl p-5 sm:p-6 mt-4 border border-gray-200">
                             <p class="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Result
                             </p>
-                            <p style="font-family:'Courier New', Courier, monospace;"
-                                class="text-sm sm:text-base md:text-lg font-bold text-gray-900 break-words leading-relaxed">
-                                {{product}}
-                            </p>
+                            <div
+                                class="text-sm sm:text-base md:text-lg text-gray-900 break-words leading-relaxed text-left">
+                                {{product|safe}}
+                            </div>
                         </div>
                         {% endif %}
 
-                        <!-- Action Buttons -->
                         <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                             <button onclick="window.scrollTo({top: 0, behavior: 'smooth'}); window.location.href='/';"
                                 class="px-6 py-3 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2">
@@ -195,21 +208,10 @@
                                 </svg>
                                 <span>Analyze Another Image</span>
                             </button>
-
-                            <a href="#features"
-                                onclick="event.preventDefault(); document.getElementById('features')?.scrollIntoView({behavior: 'smooth'});"
-                                class="px-6 py-3 bg-white text-gray-700 font-medium text-sm sm:text-base rounded-xl border-2 border-gray-200 hover:border-[#14b8a6] hover:text-[#14b8a6] hover:bg-[#f0fdfa]/30 transition-all duration-300 flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <span>Learn More</span>
-                            </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Auto-scroll Script -->
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         setTimeout(function () {
@@ -223,9 +225,8 @@
                         }, 300);
                     });
                 </script>
-
-
                 {% endif %}
+
                 <!-- Choose Method Modal -->
                 <div x-show="uploadModal" x-transition.opacity.duration.300ms @click.self="uploadModal = false"
                     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
@@ -278,169 +279,11 @@
                     </div>
                 </div>
 
-                <!-- Upload Form Modal -->
-                <div x-show="uploadFormModal" x-transition.opacity.duration.300ms @click.self="uploadFormModal = false"
-                    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
-                    x-cloak>
-                    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative border border-gray-100 animate-in"
-                        @click.stop>
-                        <button @click="uploadFormModal = false"
-                            class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors group">
-                            <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-
-                        <div class="text-center">
-                            <div
-                                class="w-16 h-16 bg-gradient-to-br from-[#f0fdfa] to-[#ccfbf1] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-                                <svg class="w-8 h-8 text-[#14b8a6]" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                    </path>
-                                </svg>
-                            </div>
-
-                            <h3 class="text-2xl font-light text-gray-900 mb-2">Upload Image</h3>
-                            <p class="text-sm text-gray-500 mb-8">Select a skin lesion image for AI analysis</p>
-
-                            <form action="/predicts" method="post" enctype="multipart/form-data" class="space-y-6"
-                                x-data="{
-                                imagePreview: null,
-                                fileName: 'Click to browse',
-                                handleFileChange(event) {
-                                    const file = event.target.files[0];
-                                    if (file) {
-                                        this.fileName = file.name;
-                                        const reader = new FileReader();
-                                        reader.onload = (e) => { this.imagePreview = e.target.result; };
-                                        reader.readAsDataURL(file);
-                                    } else {
-                                        this.fileName = 'Click to browse';
-                                        this.imagePreview = null;
-                                    }
-                                }
-                            }">
-                                <label class="block cursor-pointer group">
-                                    <div
-                                        class="border-2 border-dashed border-gray-200 rounded-2xl p-8 hover:border-[#14b8a6] hover:bg-[#f0fdfa]/30 transition-all duration-300 bg-gray-50/50 relative overflow-hidden">
-                                        <div class="text-center" x-show="!imagePreview">
-                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300 group-hover:text-[#14b8a6] transition-colors"
-                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                </path>
-                                            </svg>
-                                            <p class="text-sm font-medium text-gray-600 mb-1 group-hover:text-[#14b8a6]"
-                                                x-text="fileName"></p>
-                                            <p class="text-xs text-gray-400">JPG, PNG, JPEG, BMP • Max 16MB</p>
-                                        </div>
-
-                                        <div x-show="imagePreview" x-cloak class="relative">
-                                            <img :src="imagePreview" alt="Preview"
-                                                class="w-full h-64 object-contain rounded-lg mx-auto">
-                                            <div
-                                                class="mt-4 flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 mx-auto w-fit">
-                                                <svg class="w-4 h-4 text-[#14b8a6]" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                </svg>
-                                                <span class="text-sm font-medium text-gray-700"
-                                                    x-text="fileName"></span>
-                                            </div>
-                                            <button type="button" @click="$refs.fileInput.click()"
-                                                class="mt-3 w-full py-2 text-xs font-medium text-[#14b8a6] hover:text-[#0d9488] transition-colors">
-                                                Change Image
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <input type="file" name="file" accept="image/*" required class="hidden"
-                                        x-ref="fileInput" @change="handleFileChange($event)">
-                                </label>
-
-                                <div x-show="imagePreview" x-cloak>
-                                    <button type="submit"
-                                        class="w-full py-4 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
-                                            </path>
-                                        </svg>
-                                        <span>Analyze with AI</span>
-                                    </button>
-                                    <p class="text-xs text-gray-400 text-center mt-4">Results typically ready in under 2
-                                        seconds</p>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Choose Method Modal - RESPONSIVE -->
-                <div x-show="uploadModal" x-transition.opacity.duration.300ms @click.self="uploadModal = false"
-                    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
-                    x-cloak>
-                    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 sm:p-10 relative border border-gray-100 max-h-[90vh] overflow-y-auto"
-                        @click.stop>
-                        <button @click="uploadModal = false"
-                            class="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors group">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-gray-900 transition-colors"
-                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-
-                        <div
-                            class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#f0fdfa] to-[#ccfbf1] rounded-2xl flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-sm">
-                            <img src="{{ url_for('static', filename='images/logo-1.png') }}" alt="SKIN Logo"
-                                class="w-10 h-10 sm:w-12 sm:h-12 object-contain">
-                        </div>
-
-                        <h2 class="text-xl sm:text-2xl font-light text-gray-900 text-center mb-2">Choose Method</h2>
-                        <p class="text-xs sm:text-sm text-gray-500 text-center mb-6 sm:mb-8">Select how you'd like to
-                            analyze</p>
-
-                        <div class="space-y-3">
-                            <button @click="uploadModal = false; uploadFormModal = true"
-                                class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                    </path>
-                                </svg>
-                                <span>Upload Image</span>
-                            </button>
-
-                            <button @click="uploadModal = false; captureModal = true"
-                                class="w-full py-3 sm:py-4 px-4 sm:px-6 bg-white text-gray-700 font-medium text-sm sm:text-base rounded-xl border-2 border-gray-200 hover:border-[#14b8a6] hover:text-[#14b8a6] hover:bg-[#f0fdfa]/30 transition-all duration-300 flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <span>Use Camera</span>
-                            </button>
-                        </div>
-
-                        <p class="text-xs text-gray-400 text-center mt-4 sm:mt-6">Both methods use AI-powered CNN
-                            analysis</p>
-                    </div>
-                </div>
-
-                <!-- Upload Form Modal - RESPONSIVE -->
+                <!-- Upload Form Modal with Model Selector -->
                 <div x-show="uploadFormModal" x-transition.opacity.duration.300ms @click.self="uploadFormModal = false"
                     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto"
                     x-cloak>
-                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 relative border border-gray-100 my-4 animate-in"
+                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 relative border border-gray-100 my-4 animate-in max-h-[95vh] overflow-y-auto"
                         @click.stop>
                         <button @click="uploadFormModal = false"
                             class="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors group z-10">
@@ -462,9 +305,9 @@
                                 </svg>
                             </div>
 
-                            <h3 class="text-xl sm:text-2xl font-light text-gray-900 mb-2">Upload Image</h3>
-                            <p class="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8">Select a skin lesion image for AI
-                                analysis</p>
+                            <h3 class="text-xl sm:text-2xl font-light text-gray-900 mb-2">Upload & Analyze</h3>
+                            <p class="text-xs sm:text-sm text-gray-500 mb-6 sm:mb-8">Select detection model and upload
+                                image</p>
 
                             <form action="/predicts" method="post" enctype="multipart/form-data"
                                 class="space-y-4 sm:space-y-6" x-data="{
@@ -483,6 +326,78 @@
                                 }
                             }
                         }">
+
+                                <!-- ✅ UPDATED: MODEL SELECTOR -->
+                                <div class="text-left mb-6">
+
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <!-- ✅ UPDATED: Skin Cancer Lesion Model -->
+                                        <label
+                                            class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
+                                            <input type="radio" name="model_type" value="ham10000" checked
+                                                x-model="selectedModel" class="sr-only">
+                                            <div class="flex items-start gap-3">
+                                                <div
+                                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center">
+                                                    <svg class="w-6 h-6 text-purple-600" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="font-semibold text-gray-900 text-sm mb-1">Skin Cancer
+                                                        Lesion
+                                                    </h4>
+                                                    <p class="text-xs text-gray-600 mb-1">7-class lesion detection
+                                                    </p>
+                                                    <div class="flex items-center gap-2">
+                                                        <span
+                                                            class="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded">71.64%
+                                                            Acc</span>
+                                                        <span class="text-xs text-gray-400">H5</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 mt-2">Melanoma, BCC, Nevus, etc.</p>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <!-- Monkeypox Model -->
+                                        <label
+                                            class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
+                                            <input type="radio" name="model_type" value="monkeypox"
+                                                x-model="selectedModel" class="sr-only">
+                                            <div class="flex items-start gap-3">
+                                                <div
+                                                    class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                                                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1 min-width: 0;">
+                                                    <h4 class="font-semibold text-gray-900 text-sm mb-1">Monkeypox</h4>
+                                                    <p class="text-xs text-gray-600 mb-1">Binary virus detection</p>
+                                                    <div class="flex items-center gap-2">
+                                                        <span
+                                                            class="inline-block px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">95.0%
+                                                            Acc</span>
+                                                        <span class="text-xs text-gray-400">TFLite</span>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 mt-2">Monkeypox vs Others</p>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- File Upload Area -->
                                 <label class="block cursor-pointer group">
                                     <div
                                         class="border-2 border-dashed border-gray-200 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:border-[#14b8a6] hover:bg-[#f0fdfa]/30 transition-all duration-300 bg-gray-50/50 relative overflow-hidden">
@@ -495,7 +410,7 @@
                                             </svg>
                                             <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1 group-hover:text-[#14b8a6] px-2"
                                                 x-text="fileName"></p>
-                                            <p class="text-xs text-gray-400">JPG, PNG, JPEG, BMP • Max 16MB</p>
+                                            <p class="text-xs text-gray-400">JPG, PNG, JPEG, BMP • Max 8MB</p>
                                         </div>
 
                                         <div x-show="imagePreview" x-cloak class="relative">
@@ -522,6 +437,7 @@
                                         x-ref="fileInput" @change="handleFileChange($event)">
                                 </label>
 
+                                <!-- ✅ UPDATED: Submit Button Text -->
                                 <div x-show="imagePreview" x-cloak>
                                     <button type="submit"
                                         class="w-full py-3 sm:py-4 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
@@ -531,182 +447,273 @@
                                                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
                                             </path>
                                         </svg>
-                                        <span>Analyze with AI</span>
+                                        <span>Analyze with <span
+                                                x-text="selectedModel === 'ham10000' ? 'Skin Cancer' : 'Monkeypox'"></span>
+                                            AI</span>
                                     </button>
                                     <p class="text-xs text-gray-400 text-center mt-3 sm:mt-4">Results typically ready in
-                                        under 2
-                                        seconds</p>
+                                        under 2 seconds</p>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
 
-                <!-- Capture Modal - RESPONSIVE -->
-                <div x-show="captureModal" x-transition.opacity.duration.300ms
-                    class="fixed inset-0 z-[99999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
-                    @click.self="captureModal = false" x-cloak>
-
-                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl p-4 sm:p-6 md:p-8 relative max-h-[95vh] overflow-y-auto border border-gray-100 my-4"
-                        @click.stop x-data="cameraCapture()" x-init="startCamera()"
-                        @close-modal.window="cleanup(); captureModal = false">
-
-                        <!-- Close Button -->
-                        <button @click="cleanup(); captureModal = false"
-                            class="absolute top-2 right-2 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/90 hover:bg-gray-100 transition-colors group z-20 shadow-lg">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 group-hover:text-gray-900" fill="none"
+                <!-- ✅ CAMERA CAPTURE MODAL WITH MODEL SELECTOR -->
+                <div x-show="captureModal" x-transition.opacity.duration.300ms @click.self="captureModal = false"
+                    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto"
+                    x-cloak>
+                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 relative border border-gray-100 my-4 animate-in max-h-[95vh] overflow-y-auto"
+                        @click.stop>
+                        <button @click="captureModal = false"
+                            class="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors group z-10">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-gray-900" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
 
-                        <div class="text-center">
-                            <!-- Header -->
+                        <div class="text-center mb-6">
                             <div
-                                class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#f0fdfa] to-[#ccfbf1] rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6 shadow-sm">
-                                <svg class="w-6 h-6 sm:w-7 sm:h-7 text-[#14b8a6]" fill="none" stroke="currentColor"
+                                class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#f0fdfa] to-[#ccfbf1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-[#14b8a6]" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                         d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
                                     </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
                             </div>
 
-                            <h2 class="text-lg sm:text-xl md:text-2xl font-light text-gray-900 mb-1 sm:mb-2">Live Camera
-                            </h2>
-                            <p class="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 md:mb-8">Position the skin lesion in
-                                the frame</p>
+                            <h3 class="text-xl sm:text-2xl font-light text-gray-900 mb-2">Camera Capture</h3>
+                            <p class="text-xs sm:text-sm text-gray-500 mb-6">Select model and capture your skin image
+                            </p>
 
-                            <!-- Camera View -->
-                            <div class="relative bg-black rounded-xl sm:rounded-2xl overflow-hidden mb-4 sm:mb-6"
-                                style="aspect-ratio: 4/3;">
-                                <!-- Video Stream -->
-                                <video x-ref="video" x-show="!capturing" autoplay playsinline muted
-                                    class="w-full h-full object-cover"></video>
+                            <!-- ✅ UPDATED: Model Selector for Camera -->
+                            <div class="text-left mb-6 max-w-2xl mx-auto">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">
+                                    🔬 Select Detection Model:
+                                </label>
 
-                                <!-- Captured Image Preview -->
-                                <img x-show="capturing" :src="capturedImage" x-cloak alt="Captured"
-                                    class="w-full h-full object-cover">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <!-- ✅ UPDATED: Skin Cancer Lesion -->
+                                    <label class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
+                                        <input type="radio" name="camera_model_type" value="ham10000" checked
+                                            x-model="selectedModel" class="sr-only">
+                                        <div class="flex items-start gap-3">
+                                            <div
+                                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center">
+                                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-semibold text-gray-900 text-sm mb-1">Skin Cancer Lesion
+                                                </h4>
+                                                <p class="text-xs text-gray-600">7-class lesion detection</p>
+                                                <span
+                                                    class="inline-block mt-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded">71.64%
+                                                    Acc</span>
+                                            </div>
+                                        </div>
+                                    </label>
 
-                                <!-- Frame Overlay -->
-                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <div class="w-[85%] h-[85%] border-2 border-white/50 rounded-xl sm:rounded-2xl">
-                                    </div>
-                                </div>
-
-                                <!-- Switch Camera Button -->
-                                <button x-show="!capturing && (isMobile || devices.length > 1)" @click="switchCamera()"
-                                    class="absolute top-2 right-2 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-all">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-                                        </path>
-                                    </svg>
-                                </button>
-
-                                <!-- Device Type Indicator -->
-                                <div
-                                    class="absolute top-2 left-2 sm:top-4 sm:left-4 bg-black/50 text-white text-xs px-2 py-1 sm:px-3 rounded-full backdrop-blur-sm">
-                                    <span x-text="isMobile ? '📱 Mobile' : '🖥️ Desktop'"></span>
-                                </div>
-
-                                <!-- Alignment Guide -->
-                                <div x-show="!capturing"
-                                    class="absolute bottom-3 sm:bottom-4 left-0 right-0 text-center">
-                                    <span
-                                        class="inline-block bg-black/60 text-white text-xs px-2 py-1 sm:px-3 rounded-full backdrop-blur-sm">
-                                        Align lesion within frame
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Hidden Canvas -->
-                            <canvas x-ref="canvas" class="hidden"></canvas>
-
-                            <!-- Action Buttons - Before Capture -->
-                            <div x-show="!capturing" class="space-y-2 sm:space-y-3">
-                                <button @click="capturePhoto()"
-                                    class="w-full py-3 sm:py-4 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                        </path>
-                                    </svg>
-                                    <span>Capture Photo</span>
-                                </button>
-                            </div>
-
-                            <!-- Action Buttons - After Capture -->
-                            <div x-show="capturing" x-cloak class="space-y-2 sm:space-y-3">
-                                <button @click="uploadCapture($event)"
-                                    class="w-full py-3 sm:py-4 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                        </path>
-                                    </svg>
-                                    <span>Analyze Image</span>
-                                </button>
-
-                                <button @click="retake()"
-                                    class="w-full py-2.5 sm:py-3 bg-white text-gray-700 font-medium text-sm sm:text-base rounded-xl border-2 border-gray-200 hover:border-[#14b8a6] hover:text-[#14b8a6] transition-all duration-300">
-                                    Retake Photo
-                                </button>
-                            </div>
-
-                            <!-- Tips -->
-                            <div
-                                class="mt-4 sm:mt-6 bg-[#f0fdfa] border border-[#14b8a6]/20 rounded-xl sm:rounded-2xl p-3 sm:p-4 text-left">
-                                <div class="flex items-start gap-2 sm:gap-3">
-                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#14b8a6] flex-shrink-0 mt-0.5" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                    <div class="text-xs sm:text-sm text-gray-700">
-                                        <p class="font-medium text-[#14b8a6] mb-1">Tips for best results:</p>
-                                        <ul class="space-y-0.5 sm:space-y-1 text-gray-600">
-                                            <li>• Ensure good lighting</li>
-                                            <li>• Hold camera steady</li>
-                                            <li>• Fill frame with lesion</li>
-                                            <li x-show="isMobile">• Use rear camera</li>
-                                            <li x-show="!isMobile">• Position 6-12 inches away</li>
-                                        </ul>
-                                    </div>
+                                    <!-- Monkeypox -->
+                                    <label class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
+                                        <input type="radio" name="camera_model_type" value="monkeypox"
+                                            x-model="selectedModel" class="sr-only">
+                                        <div class="flex items-start gap-3">
+                                            <div
+                                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
+                                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                                    </path>
+                                                </svg>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="font-semibold text-gray-900 text-sm mb-1">Monkeypox</h4>
+                                                <p class="text-xs text-gray-600">Binary virus detection</p>
+                                                <span
+                                                    class="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">95.0%
+                                                    Acc</span>
+                                            </div>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Camera Feed -->
+                        <div
+                            class="bg-gray-900 rounded-xl overflow-hidden mb-6 border-4 border-gray-200 max-w-2xl mx-auto">
+                            <img id="video_feed" src="{{ url_for('video_feed') }}" alt="Camera Feed"
+                                class="w-full h-auto object-contain"
+                                onerror="this.src='/static/images/camera-error.png'">
+                        </div>
+
+                        <!-- ✅ UPDATED: Capture Button -->
+                        <form action="/tasks" method="post" id="cameraForm">
+                            <input type="hidden" name="model_type" :value="selectedModel">
+                            <input type="hidden" name="click" value="Capture">
+
+                            <button type="submit"
+                                class="w-full py-3 sm:py-4 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                    </path>
+                                </svg>
+                                <span>Capture & Analyze with <span
+                                        x-text="selectedModel === 'ham10000' ? 'Skin Cancer' : 'Monkeypox'"></span></span>
+                            </button>
+                        </form>
+
+                        <p class="text-xs text-gray-400 text-center mt-4">
+                            Position skin lesion in center • Good lighting recommended
+                        </p>
                     </div>
                 </div>
 
 
-                <!-- (Use the complete camera modal from my previous response) -->
-
-                <!-- Stats -->
-                <div class="mt-20 grid grid-cols-3 gap-8 max-w-xl mx-auto">
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6]">95%</div>
-                        <div class="text-sm font-light text-[#737373] mt-1">Accuracy</div>
+                <div class="mt-20 grid grid-cols-3 gap-8 max-w-xl mx-auto" id="stats-section">
+                    <div class="text-center stat-item" data-target="2">
+                        <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6] counter" data-speed="1000">0</div>
+                        <div class="text-sm font-light text-[#737373] mt-1">AI Models</div>
                     </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6]">&lt;2s</div>
+                    <div class="text-center stat-item" data-target="2">
+                        <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6] counter-seconds" data-speed="800">
+                            &lt;0s</div>
                         <div class="text-sm font-light text-[#737373] mt-1">Analysis Time</div>
                     </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6]">100K+</div>
-                        <div class="text-sm font-light text-[#737373] mt-1">Images Trained</div>
+                    <div class="text-center stat-item" data-target="95">
+                        <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6] counter-percent" data-speed="30">
+                            0%</div>
+                        <div class="text-sm font-light text-[#737373] mt-1">Max Accuracy</div>
                     </div>
                 </div>
+
+                <!-- Animation Script -->
+                <script>
+                    // ✅ Animated Counter Function
+                    function animateCounter(element, target, speed, isPercent = false, isSeconds = false) {
+                        let current = 0;
+                        const increment = target / speed;
+
+                        const updateCounter = () => {
+                            current += increment;
+                            if (current < target) {
+                                if (isPercent) {
+                                    element.textContent = Math.ceil(current) + '%';
+                                } else if (isSeconds) {
+                                    element.textContent = '<' + Math.ceil(current) + 's';
+                                } else {
+                                    element.textContent = Math.ceil(current);
+                                }
+                                requestAnimationFrame(updateCounter);
+                            } else {
+                                if (isPercent) {
+                                    element.textContent = target + '%';
+                                } else if (isSeconds) {
+                                    element.textContent = '<' + target + 's';
+                                } else {
+                                    element.textContent = target;
+                                }
+                            }
+                        };
+
+                        requestAnimationFrame(updateCounter);
+                    }
+
+                    // ✅ Intersection Observer - Trigger when visible
+                    const statsSection = document.getElementById('stats-section');
+                    let hasAnimated = false;
+
+                    const observerOptions = {
+                        threshold: 0.5,
+                        rootMargin: '0px'
+                    };
+
+                    const statsObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && !hasAnimated) {
+                                hasAnimated = true;
+
+                                // Animate first counter (AI Models)
+                                const counter1 = document.querySelector('.counter');
+                                animateCounter(counter1, 2, 50);
+
+                                // Animate second counter (Analysis Time)
+                                setTimeout(() => {
+                                    const counter2 = document.querySelector('.counter-seconds');
+                                    animateCounter(counter2, 2, 50, false, true);
+                                }, 200);
+
+                                // Animate third counter (Accuracy)
+                                setTimeout(() => {
+                                    const counter3 = document.querySelector('.counter-percent');
+                                    animateCounter(counter3, 95, 30, true);
+                                }, 400);
+                            }
+                        });
+                    }, observerOptions);
+
+                    if (statsSection) {
+                        statsObserver.observe(statsSection);
+                    }
+                </script>
+
+                <style>
+                    /* ✅ Add smooth fade-in animation */
+                    .stat-item {
+                        opacity: 0;
+                        transform: translateY(20px);
+                        animation: fadeInUp 0.8s ease forwards;
+                    }
+
+                    .stat-item:nth-child(1) {
+                        animation-delay: 0.1s;
+                    }
+
+                    .stat-item:nth-child(2) {
+                        animation-delay: 0.3s;
+                    }
+
+                    .stat-item:nth-child(3) {
+                        animation-delay: 0.5s;
+                    }
+
+                    @keyframes fadeInUp {
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+
+                    /* ✅ Pulse effect on numbers */
+                    .counter,
+                    .counter-seconds,
+                    .counter-percent {
+                        display: inline-block;
+                        transition: transform 0.3s ease;
+                    }
+
+                    .stat-item:hover .counter,
+                    .stat-item:hover .counter-seconds,
+                    .stat-item:hover .counter-percent {
+                        transform: scale(1.1);
+                    }
+                </style>
+
             </div>
         </div>
 
-        <!-- Scroll Indicator -->
         <div class="absolute bottom-8 left-1/2 -translate-x-1/2">
             <div
                 class="w-6 h-10 rounded-full border-2 border-gray-400/30 flex items-start justify-center p-2 animate-bounce">
@@ -720,185 +727,17 @@
     {% include 'testimonial.html' %}
     {% include 'footer.html' %}
 
-</body>
-
-<script>
-
-    function cameraCapture() {
-        return {
-            stream: null,
-            capturing: false,
-            capturedImage: null,
-            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-            facingMode: 'environment',
-            devices: [],
-            currentDeviceId: null,
-
-            async getDevices() {
-                try {
-                    const deviceList = await navigator.mediaDevices.enumerateDevices();
-                    this.devices = deviceList.filter(device => device.kind === 'videoinput');
-                    console.log('Available cameras:', this.devices);
-                } catch (err) {
-                    console.error('Error enumerating devices:', err);
-                }
-            },
-
-            async startCamera() {
-                try {
-                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                        alert('Camera access is not supported in your browser. Please use Chrome, Firefox, or Safari.');
-                        return;
-                    }
-
-                    this.stopCamera();
-                    await this.getDevices();
-
-                    let constraints;
-
-                    if (this.isMobile) {
-                        constraints = {
-                            video: {
-                                facingMode: this.facingMode,
-                                width: { ideal: 1920 },
-                                height: { ideal: 1080 }
-                            }
-                        };
-                    } else {
-                        if (this.currentDeviceId) {
-                            constraints = {
-                                video: {
-                                    deviceId: { exact: this.currentDeviceId },
-                                    width: { ideal: 1920 },
-                                    height: { ideal: 1080 }
-                                }
-                            };
-                        } else {
-                            constraints = {
-                                video: {
-                                    width: { ideal: 1920 },
-                                    height: { ideal: 1080 }
-                                }
-                            };
-                        }
-                    }
-
-                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-                    this.$refs.video.srcObject = this.stream;
-                    await this.$refs.video.play();
-
-                } catch (err) {
-                    console.error('Camera error:', err);
-
-                    if (err.name === 'NotAllowedError') {
-                        alert('Camera access denied. Please allow camera permission in your browser settings.');
-                    } else if (err.name === 'NotFoundError') {
-                        alert('No camera found on this device.');
-                    } else if (err.name === 'NotReadableError') {
-                        alert('Camera is already in use by another application.');
-                    } else {
-                        alert('Camera error: ' + err.message);
-                    }
-                }
-            },
-
-            async switchCamera() {
-                if (this.isMobile) {
-                    this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
-                } else {
-                    if (this.devices.length > 1) {
-                        const currentIndex = this.devices.findIndex(d => d.deviceId === this.currentDeviceId);
-                        const nextIndex = (currentIndex + 1) % this.devices.length;
-                        this.currentDeviceId = this.devices[nextIndex].deviceId;
-                    }
-                }
-                await this.startCamera();
-            },
-
-            capturePhoto() {
-                const video = this.$refs.video;
-                const canvas = this.$refs.canvas;
-                const context = canvas.getContext('2d');
-
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                this.capturedImage = canvas.toDataURL('image/jpeg', 0.92);
-                this.capturing = true;
-            },
-
-            retake() {
-                this.capturedImage = null;
-                this.capturing = false;
-            },
-
-            async uploadCapture(event) {
-                try {
-                    const button = event.target;
-                    button.disabled = true;
-                    button.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
-
-                    // Convert base64 to blob
-                    const response = await fetch(this.capturedImage);
-                    const blob = await response.blob();
-
-                    // Create form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '/predicts';
-                    form.enctype = 'multipart/form-data';
-
-                    // Create file input
-                    const fileInput = document.createElement('input');
-                    fileInput.type = 'file';
-                    fileInput.name = 'file';
-
-                    // Convert blob to file
-                    const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    fileInput.files = dataTransfer.files;
-
-                    // Append and submit
-                    form.appendChild(fileInput);
-                    document.body.appendChild(form);
-
-                    // Submit form (this will navigate to results page)
-                    form.submit();
-
-                } catch (error) {
-                    console.error('Upload error:', error);
-                    alert('Failed to upload image: ' + error.message);
-
-                    // Re-enable button
-                    if (event && event.target) {
-                        event.target.disabled = false;
-                        event.target.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg><span>Analyze Image</span>';
-                    }
-                }
-            },
-
-            stopCamera() {
-                if (this.stream) {
-                    this.stream.getTracks().forEach(track => track.stop());
-                    this.stream = null;
-                }
-            },
-
-            cleanup() {
-                this.stopCamera();
-                this.capturedImage = null;
-                this.capturing = false;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const videoFeed = document.getElementById('video_feed');
+            if (videoFeed) {
+                videoFeed.onerror = function () {
+                    console.error('Video feed error - camera may not be available');
+                };
             }
-        }
-    }
-</script>
-
+        });
+    </script>
 
 </body>
-
-</html>
-
 
 </html>

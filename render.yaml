@@ -4,14 +4,22 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
-    startCommand: gunicorn -c frontend/gunicorn_config.py --worker-tmp-dir /dev/shm frontend.app:app
+    startCommand: gunicorn -c gunicorn_config.py --worker-tmp-dir /dev/shm app:app
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.18
-      - key: MODEL_PATH
+        value: 3.11.0
+      - key: HAM10000_MODEL_PATH
+        value: backend/models/HAM10000_MobileNetV2_TF2_15.h5
+      - key: MONKEYPOX_MODEL_PATH
         value: backend/models/model.tflite
       - key: TF_CPP_MIN_LOG_LEVEL
         value: 3
       - key: FLASK_ENV
         value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OMP_NUM_THREADS
+        value: 2
+      - key: MAX_CONTENT_LENGTH
+        value: 8388608
