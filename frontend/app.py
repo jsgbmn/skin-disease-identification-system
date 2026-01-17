@@ -20,7 +20,7 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 # ✅ Multiple model configurations with correct paths
 MODELS = {
     'ham10000': {
-        'path': '/Users/jsgbn/Desktop/skin-identification/backend/models/HAM10000_MobileNetV2_TF2_15.h5',
+        'path': '../backend/models/HAM10000_MobileNetV2_TF2_15.h5',
         'type': 'h5',
         'classes': ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'],
         'descriptions': {
@@ -41,7 +41,7 @@ MODELS = {
         'name': 'HAM10000 Skin Lesion Classifier'
     },
     'monkeypox': {
-        'path': '/Users/jsgbn/Desktop/skin-identification/backend/models/model.tflite',
+        'path': '../backend/models/model.tflite',
         'type': 'tflite',
         'classes': ['Monkeypox', 'Others'],
         'descriptions': {
