@@ -107,6 +107,11 @@ notebooks/.ipynb_checkpoints/
 # Jupyter Notebook temporary files
 .virtual_documents/
 
+# Exclude notebooks directory but keep structure
+notebooks/*
+!notebooks/.gitkeep
+!notebooks/README.md
+
 # ========================================
 # IDE & EDITORS
 # ========================================
@@ -137,9 +142,11 @@ $RECYCLE.BIN/
 # ========================================
 # MACHINE LEARNING SPECIFIC
 # ========================================
-# Large model files (if not tracked with Git LFS)
+# Ignore model files EXCEPT in backend/models/
 *.h5
 *.hdf5
+*.tflite
+*.onnx
 *.pkl
 *.pickle
 *.joblib
@@ -147,13 +154,16 @@ $RECYCLE.BIN/
 *.pth
 *.ckpt
 *.pb
-*.tflite
-*.onnx
+
+# ✅ BUT ALLOW MODELS IN backend/models/ directory
+!backend/models/*.h5
+!backend/models/*.hdf5
+!backend/models/*.tflite
+!backend/models/*.onnx
 
 # Training artifacts
 checkpoints/
 runs/
-logs/
 tensorboard_logs/
 mlruns/
 
@@ -169,24 +179,19 @@ datasets/
 # Cache directories
 .cache/
 cache/
-__pycache__/
 
 # ========================================
 # PROJECT SPECIFIC EXCLUSIONS
 # ========================================
-# Exclude specific project directories
-notebooks/
-frontend/venv/
-backend/models/
-
-# But keep directory structure
-!notebooks/.gitkeep
-!backend/models/.gitkeep
-
 # Exclude uploaded images
-static/Data/
-static/uploads/
-uploads/
+static/Data/*
+!static/Data/.gitkeep
+
+static/uploads/*
+!static/uploads/.gitkeep
+
+uploads/*
+!uploads/.gitkeep
 
 # Exclude temporary files
 tmp/
@@ -196,6 +201,13 @@ temp/
 *.swp
 *.swo
 *~
+
+# ========================================
+# VIRTUAL ENVIRONMENTS
+# ========================================
+frontend/venv/
+backend/venv/
+skin-disease-env/
 
 # ========================================
 # DOCUMENTATION
@@ -254,7 +266,11 @@ cython_debug/
 !.gitignore
 !README.md
 !LICENSE
+!render.yaml
+!gunicorn_config.py
 
-# Keep model metadata (but not models themselves)
+# Keep backend/models directory structure and metadata
+!backend/models/
+!backend/models/.gitkeep
 !backend/models/README.md
 !backend/models/model_info.json

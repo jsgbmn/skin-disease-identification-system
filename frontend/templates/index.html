@@ -29,6 +29,33 @@
             }
         }
     </script>
+    <style>
+        /* Mobile result container fix */
+        #results {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Ensure all result content is responsive */
+        #results * {
+            max-width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+        }
+
+        /* Mobile typography */
+        @media (max-width: 640px) {
+            #results h3 {
+                font-size: 18px !important;
+            }
+
+            #results p {
+                font-size: 12px !important;
+            }
+        }
+    </style>
 
     <style>
         body {
