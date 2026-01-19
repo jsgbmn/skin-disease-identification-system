@@ -10,9 +10,9 @@ from werkzeug.utils import secure_filename
 import gc
 from pathlib import Path
 import base64
+import io
+from PIL import Image
 
-# ========== CONFIGURATION ==========
-UPLOAD_FOLDER = './static/Data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 
 def find_models_dir():
@@ -54,8 +54,8 @@ MODELS = {
     'monkeypox': {
         'path': str(MODELS_DIR / 'model.tflite'),
         'type': 'tflite',
-        'binary_output': True,  # ✅ NEW: Indicates single output value
-        'threshold': 0.5,  # ✅ NEW: Threshold for classification
+        'binary_output': True,
+        'threshold': 0.5,
         'classes': ['Monkeypox', 'Not Monkeypox'],
         'descriptions': {
             'Monkeypox': 'Monkeypox Virus Infection',
@@ -69,14 +69,11 @@ MODELS = {
 }
 
 app = Flask(__name__, template_folder="templates")
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production-2026')
 
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 loaded_models = {}
 
-# ========== HELPER FUNCTIONS ==========
 def format_error(error_message: str) -> str:
     return f"""
     <div style='max-width: 600px; width: 100%; margin: 0 auto; padding: 20px; box-sizing: border-box; text-align: center;'>
@@ -119,7 +116,6 @@ def get_model(model_type: str):
 
         if model_config['type'] == 'h5':
             import tensorflow as tf
-            print(f"📦 Loading {model_type} H5 model from: {model_path}")
 
             model = None
             strategies = [
@@ -127,13 +123,11 @@ def get_model(model_type: str):
                 lambda: tf.keras.models.load_model(model_path, compile=False, safe_mode=False),
             ]
 
-            for i, load_fn in enumerate(strategies):
+            for load_fn in strategies:
                 try:
                     model = load_fn()
-                    print(f"✅ H5 model loaded successfully")
                     break
-                except Exception as e:
-                    print(f"⚠️ Strategy {i+1} failed: {str(e)}")
+                except:
                     continue
 
             if model is None:
@@ -148,7 +142,6 @@ def get_model(model_type: str):
 
         elif model_config['type'] == 'tflite':
             import tensorflow as tf
-            print(f"📦 Loading {model_type} TFLite model from: {model_path}")
 
             interpreter = tf.lite.Interpreter(model_path=model_path)
             interpreter.allocate_tensors()
@@ -157,12 +150,7 @@ def get_model(model_type: str):
             output_details = interpreter.get_output_details()
             input_shape = input_details[0]['shape']
 
-            print(f"✅ TFLite model loaded")
-            print(f"   Input shape: {input_shape}")
-            print(f"   Output shape: {output_details[0]['shape']}")
-
             if input_shape[1] != model_config['input_size']:
-                print(f"⚠️ Adjusting input size: {model_config['input_size']} → {input_shape[1]}")
                 model_config['input_size'] = input_shape[1]
 
             dummy = np.zeros(input_shape, dtype=np.float32)
@@ -181,30 +169,23 @@ def get_model(model_type: str):
 
     return loaded_models[model_type]
 
-def load_image(img_path: str, input_size: int) -> np.ndarray:
-    from PIL import Image
-    img = Image.open(img_path).convert('RGB')
+def load_image_from_pil(pil_image: Image.Image, input_size: int) -> np.ndarray:
+    img = pil_image.convert('RGB')
     img = img.resize((input_size, input_size))
     img_array = np.array(img, dtype=np.float32)
     img_array = np.expand_dims(img_array, axis=0)
     return img_array / 255.0
 
-def predict_path(img_path: str, model_type: str) -> str:
+def predict_image(pil_image: Image.Image, model_type: str) -> str:
     try:
-        print(f"\n{'='*60}")
-        print(f"🔍 Prediction Request: {model_type}")
-        print(f"{'='*60}")
-
         model_config = MODELS[model_type]
         model_cache = get_model(model_type)
         input_size = model_config['input_size']
 
-        img = load_image(img_path, input_size)
-        print(f"✅ Image preprocessed: {img.shape}")
+        img = load_image_from_pil(pil_image, input_size)
 
         if model_cache['type'] == 'h5':
             predictions = model_cache['model'].predict(img, verbose=0)[0]
-            print(f"✅ H5 Predictions: {predictions}")
 
         elif model_cache['type'] == 'tflite':
             interpreter = model_cache['interpreter']
@@ -214,47 +195,24 @@ def predict_path(img_path: str, model_type: str) -> str:
             interpreter.set_tensor(input_details[0]['index'], img)
             interpreter.invoke()
             predictions = interpreter.get_tensor(output_details[0]['index'])[0]
-            print(f"✅ TFLite Raw Predictions: {predictions}")
-            print(f"   Type: {type(predictions)}, Shape: {predictions.shape if hasattr(predictions, 'shape') else 'N/A'}")
 
         del img
         gc.collect()
 
-        # ✅ FIXED: Handle binary output (single value)
         if model_config.get('binary_output', False):
-            print(f"🔍 Processing binary output...")
-
-            # Robust extraction of single value
             predictions_array = np.array(predictions).flatten()
 
             if len(predictions_array) == 1:
-                # Single output value
                 prob = float(predictions_array[0])
-                print(f"✅ Binary prediction value: {prob}")
-
-                # Convert to [Monkeypox, Not Monkeypox] probabilities
-                # If prob < 0.5: Monkeypox (index 0), else: Not Monkeypox (index 1)
                 predictions = np.array([prob, 1.0 - prob])
-                print(f"✅ Converted to probabilities: {predictions}")
+            elif len(predictions_array) >= 2:
+                predictions = predictions_array[:2]
             else:
-                # Already has 2 or more values
-                print(f"⚠️ Expected 1 output, got {len(predictions_array)}")
-                if len(predictions_array) >= 2:
-                    predictions = predictions_array[:2]
-                else:
-                    raise ValueError(f"Invalid binary model output: {predictions_array}")
+                raise ValueError(f"Invalid binary model output: {predictions_array}")
 
-        print(f"✅ Final predictions: {predictions} (shape: {predictions.shape})")
-        print(f"{'='*60}\n")
         return format_prediction_result(predictions, model_config, model_type)
 
-    except FileNotFoundError as e:
-        print(f"❌ File Error: {str(e)}")
-        return format_error(f"Model file not found: {str(e)}")
     except Exception as e:
-        import traceback
-        error_trace = traceback.format_exc()
-        print(f"❌ Prediction Error:\n{error_trace}")
         gc.collect()
         return format_error(f"Prediction failed: {str(e)}")
 
@@ -295,7 +253,6 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
             </div>
         """
 
-        # Risk assessment
         if model_type == 'ham10000':
             if pred_class in ['mel', 'bcc']:
                 result += """
@@ -364,7 +321,6 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
                 </div>
                 """
 
-        # Alternative predictions (only for multi-class)
         if len(class_names) > 2:
             top_3_idx = np.argsort(predictions)[::-1][:3]
             result += "<div style='margin-bottom: 24px; text-align: left;'><h4 style='font-size: 15px; font-weight: 500; color: #525252; margin: 0 0 16px 0;'>Alternative Possibilities</h4>"
@@ -387,7 +343,6 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
                 """
             result += "</div>"
 
-        # Binary probabilities
         if len(class_names) == 2:
             result += "<div style='margin-bottom: 24px; text-align: left;'><h4 style='font-size: 15px; font-weight: 500; color: #525252; margin: 0 0 16px 0;'>Detection Probabilities</h4>"
 
@@ -407,7 +362,6 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
                 """
             result += "</div>"
 
-        # Disclaimer
         result += """
         <div style='background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
                     padding: 16px 20px; border-radius: 12px; border-left: 4px solid #f59e0b; margin-top: 24px; text-align: left;'>
@@ -427,11 +381,8 @@ def format_prediction_result(predictions: np.ndarray, model_config: dict, model_
         return result
 
     except Exception as e:
-        import traceback
-        print(f"❌ Format Error:\n{traceback.format_exc()}")
         return format_error(f"Failed to format results: {str(e)}")
 
-# ========== ROUTES (same as before) ==========
 @app.route("/", methods=['GET'])
 @app.route("/index", methods=['GET'])
 def index():
@@ -451,32 +402,6 @@ def predicts():
         flash('Invalid model selected')
         return redirect(url_for('index'))
 
-    image_data = request.form.get('image_data')
-    if image_data:
-        try:
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"capture_{timestamp}.jpg"
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-            if ',' in image_data:
-                header, encoded = image_data.split(',', 1)
-            else:
-                encoded = image_data
-
-            image_bytes = base64.b64decode(encoded)
-            with open(file_path, 'wb') as f:
-                f.write(image_bytes)
-
-            product = predict_path(file_path, model_type)
-            user_image = url_for('static', filename=f'Data/{filename}')
-            session['from_prediction'] = True
-
-            return render_template('index.html', product=product, user_image=user_image,
-                                 models=MODELS, selected_model=model_type)
-        except Exception as e:
-            return render_template('index.html', product=format_error(f"Camera capture failed: {str(e)}"),
-                                 models=MODELS), 500
-
     if 'file' not in request.files:
         flash('No file uploaded')
         return redirect(url_for('index'))
@@ -489,14 +414,15 @@ def predicts():
 
     if file and allowed_file(file.filename):
         try:
-            filename = secure_filename(file.filename)
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            unique_filename = f"{timestamp}_{filename}"
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-            file.save(file_path)
+            image_bytes = file.read()
+            pil_image = Image.open(io.BytesIO(image_bytes))
 
-            product = predict_path(file_path, model_type)
-            user_image = url_for('static', filename=f'Data/{unique_filename}')
+            buffered = io.BytesIO()
+            pil_image.save(buffered, format="JPEG")
+            img_str = base64.b64encode(buffered.getvalue()).decode()
+            user_image = f"data:image/jpeg;base64,{img_str}"
+
+            product = predict_image(pil_image, model_type)
             session['from_prediction'] = True
 
             return render_template('index.html', product=product, user_image=user_image,
@@ -546,10 +472,7 @@ if __name__ == '__main__':
     print(f"📦 Available Models:")
     for model_name, config in MODELS.items():
         exists = "✅" if Path(config['path']).exists() else "❌"
-        file_type = config['type'].upper()
-        binary = " (Binary)" if config.get('binary_output') else ""
-        num_classes = len(config['classes'])
-        print(f"   {exists} {model_name} ({file_type}{binary}, {num_classes} classes): {Path(config['path']).name}")
-    print(f"🌐 Server starting on port {port}...")
+        print(f"   {exists} {model_name}: {config['name']}")
+    print(f"🌐 Server: http://0.0.0.0:{port}")
     print(f"{'='*60}\n")
     app.run(host='0.0.0.0', port=port, debug=False)

@@ -74,11 +74,6 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        #camera-stream {
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
         .stat-item {
             opacity: 0;
             transform: translateY(20px);
@@ -117,7 +112,6 @@
             transform: scale(1.1);
         }
 
-        /* ✅ Prevent background scrolling on mobile */
         body.modal-open {
             position: fixed;
             width: 100%;
@@ -128,16 +122,11 @@
 </head>
 
 <body class="bg-gradient-to-b from-[#fafafa] to-[#f5f5f5] antialiased" x-data="{
-    uploadModal: false,
-    captureModal: false,
     uploadFormModal: false,
-    selectedModel: 'ham10000',
-    get anyModalOpen() {
-        return this.uploadModal || this.captureModal || this.uploadFormModal;
-    }
+    selectedModel: 'ham10000'
 }" x-init="Alpine.store('modals', $data)" :class="{
-    'overflow-hidden h-screen': anyModalOpen,
-    'modal-open': anyModalOpen
+    'overflow-hidden h-screen': uploadFormModal,
+    'modal-open': uploadFormModal
 }">
 
     {% include 'navbar.html' %}
@@ -179,7 +168,7 @@
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-6 mb-20">
-                    <button @click="uploadModal = true"
+                    <button @click="uploadFormModal = true"
                         class="group relative overflow-visible px-6 py-3 rounded-full bg-[#f0fdfa] border border-[#14b8a6]/20 hover:border-[#14b8a6]/40 hover:bg-[#e6fcf9] transition-all duration-300 transform hover:scale-105">
                         <div class="absolute inset-0 pointer-events-none">
                             <div class="absolute -top-1 left-4 w-1.5 h-1.5 bg-[#14b8a6] rounded-full animate-ping">
@@ -268,58 +257,6 @@
                     });
                 </script>
                 {% endif %}
-
-                <!-- Choose Method Modal -->
-                <div x-show="uploadModal" x-transition.opacity.duration.300ms @click.self="uploadModal = false"
-                    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4"
-                    x-cloak>
-                    <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-10 relative border border-gray-100"
-                        @click.stop>
-                        <button @click="uploadModal = false"
-                            class="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors group">
-                            <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-
-                        <div
-                            class="w-14 h-14 bg-gradient-to-br from-[#f0fdfa] to-[#ccfbf1] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-                            <img src="{{ url_for('static', filename='images/logo-1.png') }}" alt="SKIN Logo"
-                                class="w-12 h-12 object-contain">
-                        </div>
-
-                        <h2 class="text-2xl font-light text-gray-900 text-center mb-2">Choose Method</h2>
-                        <p class="text-sm text-gray-500 text-center mb-8">Select how you'd like to analyze</p>
-
-                        <div class="space-y-3">
-                            <button @click="uploadModal = false; uploadFormModal = true"
-                                class="w-full py-4 px-6 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                                    </path>
-                                </svg>
-                                <span>Upload Image</span>
-                            </button>
-
-                            <button @click="uploadModal = false; captureModal = true"
-                                class="w-full py-4 px-6 bg-white text-gray-700 font-medium text-base rounded-xl border-2 border-gray-200 hover:border-[#14b8a6] hover:text-[#14b8a6] hover:bg-[#f0fdfa]/30 transition-all duration-300 flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <span>Use Camera</span>
-                            </button>
-                        </div>
-
-                        <p class="text-xs text-gray-400 text-center mt-6">Both methods use AI-powered CNN analysis</p>
-                    </div>
-                </div>
 
                 <!-- Upload Form Modal -->
                 <div x-show="uploadFormModal" x-transition.opacity.duration.300ms @click.self="uploadFormModal = false"
@@ -492,120 +429,6 @@
                     </div>
                 </div>
 
-                <!-- Camera Capture Modal -->
-                <div x-show="captureModal" x-transition.opacity.duration.300ms @click.self="captureModal = false"
-                    class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-xl p-4 overflow-y-auto"
-                    x-cloak>
-                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl w-full max-w-3xl p-6 sm:p-8 relative border border-gray-100 my-4 animate-in max-h-[95vh] overflow-y-auto"
-                        @click.stop>
-                        <button @click="captureModal = false"
-                            class="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors group z-10">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-gray-900" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-
-                        <div class="text-center mb-6">
-                            <div
-                                class="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-[#f0fdfa] to-[#ccfbf1] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                                <svg class="w-7 h-7 sm:w-8 sm:h-8 text-[#14b8a6]" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                    </path>
-                                </svg>
-                            </div>
-
-                            <h3 class="text-xl sm:text-2xl font-light text-gray-900 mb-2">Camera Capture</h3>
-                            <p class="text-xs sm:text-sm text-gray-500 mb-6">Select model and capture your skin image
-                            </p>
-
-                            <div class="text-left mb-6 max-w-2xl mx-auto">
-
-
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <label class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
-                                        <input type="radio" name="camera_model_type" value="ham10000" checked
-                                            x-model="selectedModel" class="sr-only">
-                                        <div class="flex items-start gap-3">
-                                            <div
-                                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-purple-50 to-purple-100 flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-gray-900 text-sm mb-1">Skin Cancer Lesion
-                                                </h4>
-                                                <p class="text-xs text-gray-600">7-class lesion detection</p>
-                                                <span
-                                                    class="inline-block mt-1 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded">71.64%
-                                                    Acc</span>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <label class="model-card cursor-pointer border-2 border-gray-200 rounded-xl p-4">
-                                        <input type="radio" name="camera_model_type" value="monkeypox"
-                                            x-model="selectedModel" class="sr-only">
-                                        <div class="flex items-start gap-3">
-                                            <div
-                                                class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-                                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <h4 class="font-semibold text-gray-900 text-sm mb-1">Monkeypox</h4>
-                                                <p class="text-xs text-gray-600">Binary virus detection</p>
-                                                <span
-                                                    class="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">95.0%
-                                                    Acc</span>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Camera Feed -->
-                        <div
-                            class="bg-gray-900 rounded-xl overflow-hidden mb-6 border-4 border-gray-200 max-w-2xl mx-auto relative">
-                            <video id="camera-stream" autoplay playsinline class="w-full h-auto object-contain"></video>
-                            <canvas id="camera-canvas" class="hidden"></canvas>
-                        </div>
-
-                        <form action="/predicts" method="post" id="cameraForm">
-                            <input type="hidden" name="model_type" :value="selectedModel">
-                            <input type="hidden" name="image_data" id="image-data">
-
-                            <button type="button" onclick="capturePhoto()"
-                                class="w-full py-3 sm:py-4 bg-gradient-to-r from-[#14b8a6] to-[#0d9488] text-white font-medium text-sm sm:text-base rounded-xl hover:shadow-xl hover:shadow-[#14b8a6]/30 transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                    </path>
-                                </svg>
-                                <span>Capture & Analyze with <span
-                                        x-text="selectedModel === 'ham10000' ? 'Skin Cancer' : 'Monkeypox'"></span></span>
-                            </button>
-                        </form>
-
-                        <p class="text-xs text-gray-400 text-center mt-4">Position skin lesion in center • Good lighting
-                            recommended</p>
-                    </div>
-                </div>
-
                 <div class="mt-20 grid grid-cols-3 gap-8 max-w-xl mx-auto" id="stats-section">
                     <div class="text-center stat-item" data-target="2">
                         <div class="text-3xl md:text-4xl font-semibold text-[#14b8a6] counter" data-speed="1000">0</div>
@@ -638,131 +461,11 @@
     {% include 'testimonial.html' %}
     {% include 'footer.html' %}
 
-    <!-- Camera Logic -->
     <script>
-        let videoStream = null;
-
-        // Watch for modal open/close
-        document.addEventListener('alpine:init', () => {
-            Alpine.effect(() => {
-                const body = document.querySelector('body[x-data]');
-                if (!body || !body.__x) return;
-
-                const data = body.__x.$data;
-
-                if (data.captureModal) {
-                    setTimeout(() => startCamera(), 300);
-                } else {
-                    stopCamera();
-                }
-            });
-        });
-
-        // Mobile-optimized camera function
-        async function startCamera() {
-            const video = document.getElementById('camera-stream');
-            if (!video) {
-                console.error('Video element not found');
-                return;
-            }
-
-            try {
-                stopCamera(); // Stop any existing stream
-
-                // Mobile-friendly constraints
-                const constraints = {
-                    video: {
-                        facingMode: { ideal: 'environment' }, // Use back camera on mobile
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 }
-                    },
-                    audio: false
-                };
-
-                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = videoStream;
-
-                // Ensure video plays on mobile
-                video.play().catch(err => {
-                    console.error('Video play error:', err);
-                });
-
-                console.log('✅ Camera started successfully');
-            } catch (err) {
-                console.error('Camera access error:', err);
-
-                // User-friendly error messages
-                let errorMsg = 'Could not access camera. ';
-
-                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-                    errorMsg += 'Please allow camera access in your browser settings.';
-                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
-                    errorMsg += 'No camera found on this device.';
-                } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-                    errorMsg += 'Camera is already in use by another app.';
-                } else {
-                    errorMsg += 'Please try again or use Upload Image instead.';
-                }
-
-                alert(errorMsg);
-
-                // Close camera modal on error
-                const body = document.querySelector('body[x-data]');
-                if (body && body.__x) {
-                    body.__x.$data.captureModal = false;
-                }
-            }
-        }
-
-        function stopCamera() {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-                console.log('✅ Camera stopped');
-            }
-        }
-
-        // Mobile-optimized photo capture
-        function capturePhoto() {
-            const video = document.getElementById('camera-stream');
-            const canvas = document.getElementById('camera-canvas');
-            const input = document.getElementById('image-data');
-            const form = document.getElementById('cameraForm');
-
-            if (!video || !canvas || !input || !form) {
-                console.error('Required elements not found');
-                alert('Error: Could not capture photo. Please try again.');
-                return;
-            }
-
-            // Check if video is playing
-            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
-                alert('Please wait for camera to fully load');
-                return;
-            }
-
-            // Set canvas size to match video
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Optimized quality for mobile
-            const dataURL = canvas.toDataURL('image/jpeg', 0.85);
-            input.value = dataURL;
-
-            console.log('✅ Photo captured, submitting form...');
-
-            // Stop camera before submitting
-            stopCamera();
-
-            // Submit form
-            form.submit();
-        }
-
         // Counter animation
         function animateCounter(element, target, speed, isPercent = false, isSeconds = false) {
+            if (!element) return;
+
             let current = 0;
             const increment = target / speed;
 
@@ -795,47 +498,30 @@
         const statsSection = document.getElementById('stats-section');
         let hasAnimated = false;
 
-        const observerOptions = {
-            threshold: 0.5,
-            rootMargin: '0px'
-        };
-
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !hasAnimated) {
-                    hasAnimated = true;
-
-                    const counter1 = document.querySelector('.counter');
-                    animateCounter(counter1, 2, 50);
-
-                    setTimeout(() => {
-                        const counter2 = document.querySelector('.counter-seconds');
-                        animateCounter(counter2, 2, 50, false, true);
-                    }, 200);
-
-                    setTimeout(() => {
-                        const counter3 = document.querySelector('.counter-percent');
-                        animateCounter(counter3, 95, 30, true);
-                    }, 400);
-                }
-            });
-        }, observerOptions);
-
         if (statsSection) {
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        hasAnimated = true;
+
+                        const counter1 = document.querySelector('.counter');
+                        if (counter1) animateCounter(counter1, 2, 50);
+
+                        setTimeout(() => {
+                            const counter2 = document.querySelector('.counter-seconds');
+                            if (counter2) animateCounter(counter2, 2, 50, false, true);
+                        }, 200);
+
+                        setTimeout(() => {
+                            const counter3 = document.querySelector('.counter-percent');
+                            if (counter3) animateCounter(counter3, 95, 30, true);
+                        }, 400);
+                    }
+                });
+            }, { threshold: 0.5 });
+
             statsObserver.observe(statsSection);
         }
-
-        // Clean up camera when page unloads
-        window.addEventListener('beforeunload', () => {
-            stopCamera();
-        });
-
-        // Handle page visibility changes (mobile optimization)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopCamera();
-            }
-        });
     </script>
 </body>
 
