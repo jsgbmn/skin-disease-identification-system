@@ -18,7 +18,6 @@
             display: none !important;
         }
 
-        /* Offset for fixed navbar */
         section {
             scroll-margin-top: 80px;
         }
@@ -76,16 +75,25 @@
 </head>
 
 <body class="bg-[#fafafa] min-h-screen">
-    <!-- Navbar -->
-    <nav x-data="{ isOpen: false }"
+    <!-- ✅ FIXED: Use direct Alpine.js expressions -->
+    <nav x-data="{
+            isOpen: false,
+            get hideNav() {
+                // Access parent scope variables
+                const parent = this.$el.closest('[x-data]');
+                if (!parent) return false;
+                const data = Alpine.$data(parent);
+                return data.uploadModal || data.captureModal || data.uploadFormModal;
+            }
+        }" x-show="!hideNav" x-transition.opacity.duration.300ms
         class="fixed top-0 left-0 right-0 z-50 h-16 bg-white/70 backdrop-blur-xl border-b border-gray-200/50">
+
         <div class="max-w-7xl mx-auto px-6 lg:px-8 h-full flex items-center justify-between">
             <!-- Logo with Image -->
             <a href="#hero" class="flex items-center gap-3 group">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SKIN Logo"
                     class="w-32 h-32 object-contain logo-image">
             </a>
-
 
             <!-- Desktop Navigation -->
             <div class="hidden md:flex items-center gap-10">
