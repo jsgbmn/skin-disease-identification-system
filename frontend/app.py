@@ -439,6 +439,12 @@ def predicts():
     flash('Invalid file type')
     return redirect(url_for('index'))
 
+
+@app.route('/model-performance')
+def model_performance():
+    return render_template('accuracy_chart.html')
+
+
 @app.route('/health')
 def health():
     try:

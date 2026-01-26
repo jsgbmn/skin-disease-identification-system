@@ -75,11 +75,9 @@
 </head>
 
 <body class="bg-[#fafafa] min-h-screen">
-    <!-- ✅ FIXED: Use direct Alpine.js expressions -->
     <nav x-data="{
             isOpen: false,
             get hideNav() {
-                // Access parent scope variables
                 const parent = this.$el.closest('[x-data]');
                 if (!parent) return false;
                 const data = Alpine.$data(parent);
@@ -107,6 +105,11 @@
                 </a>
                 <a href="#about" class="nav-link text-[0.9375rem] font-normal text-gray-600 hover:text-gray-900 py-1">
                     About
+                </a>
+                <!-- ✅ NEW: Model Performance Link -->
+                <a href="/model-performance"
+                    class="nav-link text-[0.9375rem] font-normal text-gray-600 hover:text-gray-900 py-1">
+                    Performance
                 </a>
                 <a href="#get-started"
                     class="btn-outline-teal relative z-0 px-5 py-2 text-sm font-medium text-[#14b8a6] border-2 border-[#14b8a6] rounded-lg hover:text-white">
@@ -153,6 +156,11 @@
                 <a href="#about" @click="isOpen = false"
                     class="text-base font-normal text-gray-600 hover:text-gray-900 hover:translate-x-2 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gray-50">
                     About
+                </a>
+                <!-- ✅ NEW: Model Performance Link (Mobile) -->
+                <a href="/model-performance" @click="isOpen = false"
+                    class="text-base font-normal text-gray-600 hover:text-gray-900 hover:translate-x-2 transition-all duration-300 py-3 px-4 rounded-lg hover:bg-gray-50">
+                    Model Performance
                 </a>
                 <a href="#get-started" @click="isOpen = false"
                     class="mt-4 text-center px-5 py-3 text-sm font-semibold bg-[#14b8a6] text-white rounded-lg hover:bg-[#0d9488] transition-all duration-300 hover:shadow-xl hover:shadow-teal-500/30 hover:scale-[1.02]">
