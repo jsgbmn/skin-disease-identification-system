@@ -2,7 +2,8 @@
 
 # SKIN Disease Identification System 🩺
 
-<img width="2836" height="2160" alt="Arc 2026-01-12 05:58:15 - Frame 283" src="https://github.com/user-attachments/assets/6b91cb31-fb70-42b5-841b-ab359deb2c4d" />
+<img width="1353" height="1079" alt="image" src="https://github.com/user-attachments/assets/aa0bbcaf-a636-41de-90f7-e2e664ffd048" />
+
 
 
 
